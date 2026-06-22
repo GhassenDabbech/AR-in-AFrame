@@ -1,0 +1,33 @@
+<html>
+
+<head>
+  <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+</head>
+
+<body>
+  <a-scene webxr="optionalFeatures: hit-test;">
+    <a-entity id="ar-viewer" position = "0 0 -1"></a-entity>
+  </a-scene>
+  
+  <script>
+  // Das "?" abschneiden und den Modell-url aus der Addresszeile auslesen (alles, was nach dem "?" steht)
+        const modelUrl = window.location.search.substring(1);
+
+        //Das Model-Viewer Element über die ID holen
+        const viewer = document.getElementById('ar-viewer');
+
+        //Prüfen, ob eine valide Modell-url übergeben wurde
+        if (modelUrl && modelUrl.trim() !== "") {
+            viewer.setAttribute('gltf-model', modelUrl);
+        } else {
+            //Fehlermeldung, falls keine URL angegeben wurde
+            viewer.style.display = "none";
+            const errorDiv = document.createElement('div');
+            errorDiv.className = "error-message";
+            errorDiv.innerText = "Fehler: Kein 3D-Modell in der URL angegeben!";
+            document.body.appendChild(errorDiv);
+        }
+  </script>
+</body>
+
+</html>

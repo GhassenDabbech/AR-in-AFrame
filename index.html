@@ -5,7 +5,11 @@
 </head>
 
 <body>
-  <a-scene webxr="optionalFeatures: hit-test;">
+  <a-scene
+    webxr= "mode: ar;
+    optionalFeatures: hit-test;"
+    background= "transparent: true">
+
     <a-entity id="ar-viewer" position = "0 0 -1"></a-entity>
   </a-scene>
   

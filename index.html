@@ -13,11 +13,10 @@
 <body>
   <a-scene
     webxr= "mode: ar;
-    optionalFeatures: hit-test;"
+    requiredFeatures: local-floor hit-test;"
     vr-mode-ui="enterVR: false; enterAR: true"
     renderer= "alpha: true; colorManagement: true;"
-    background= "transparent: true"
-    ar-passthrough>
+    background= "transparent: true">
 
     <a-entity id="ar-viewer" position = "0 0 -1"></a-entity>
   </a-scene>
@@ -39,12 +38,6 @@
             errorDiv.className = "error-message";
             errorDiv.innerText = "Fehler: Kein 3D-Modell in der URL angegeben!";
             document.body.appendChild(errorDiv);
-        }
-
-        sceneEl.addEventListener('loaded', function()) {
-          if (sceneEl.isMobile || navigator.xr){
-            sceneEl.enterVR(true);
-          }
         }
   </script>
 </body>

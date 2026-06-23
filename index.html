@@ -43,6 +43,14 @@
             errorDiv.innerText = "Fehler: Kein 3D-Modell in der URL angegeben!";
             document.body.appendChild(errorDiv);
         }
+
+        document.querySelector('a-scene').addEventListener('enter-vr', function () {
+            if (this.is(ar-mode)){
+              const renderer = this.renderer;
+              renderer.setClearColor(0x000000, 0);
+              renderer.clear();
+            }
+        });
   </script>
 </body>
 

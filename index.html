@@ -16,8 +16,8 @@
     optionalFeatures: hit-test;"
     vr-mode-ui="enterVR: false; enterAR: true"
     renderer= "alpha: true; colorManagement: true;"
-    device-orientation-permission-ui="enabled: false"
-    background= "transparent: true">
+    background= "transparent: true"
+    ar-passthrough>
 
     <a-entity id="ar-viewer" position = "0 0 -1"></a-entity>
   </a-scene>
@@ -39,6 +39,12 @@
             errorDiv.className = "error-message";
             errorDiv.innerText = "Fehler: Kein 3D-Modell in der URL angegeben!";
             document.body.appendChild(errorDiv);
+        }
+
+        sceneEl.addEventListener('loaded', function()) {
+          if (sceneEl.isMobile || navigator.xr){
+            sceneEl.enterVR(true);
+          }
         }
   </script>
 </body>

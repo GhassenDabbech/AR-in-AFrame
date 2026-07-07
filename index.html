@@ -54,25 +54,32 @@
 
     <a-entity
       laser-controls="hand: right"
-      raycaster="objects: [gltf-model], .interactable; far: 5; showLine: true;"
-      super-hands="colliderEvent: raycaster-intersection; 
-                 colliderEventProperty: els; 
-                 colliderEndEvent: raycaster-intersection-cleared; 
-                 colliderEndEventProperty: clearedEls;">
+      raycaster="objects: .interactable; far: 5; showLine: true;"
+      super-hands="grabStartButtons: triggerdown; 
+                  grabEndButtons: triggerup;
+                  stretchStartButtons: triggerdown;
+                  stretchEndButtons: triggerup;
+                  colliderEvent: raycaster-intersection; 
+                  colliderEventProperty: els; 
+                  colliderEndEvent: raycaster-intersection-cleared; 
+                  colliderEndEventProperty: clearedEls;">
     </a-entity>
     
     <a-entity
       laser-controls="hand: left"
-      raycaster="objects: [gltf-model], .interactable; far: 5; showLine: true;"
-      super-hands="colliderEvent: raycaster-intersection; 
-                 colliderEventProperty: els; 
-                 colliderEndEvent: raycaster-intersection-cleared; 
-                 colliderEndEventProperty: clearedEls;">
+      raycaster="objects: .interactable; far: 5; showLine: true;"
+      super-hands="grabStartButtons: triggerdown; 
+                  grabEndButtons: triggerup;
+                  stretchStartButtons: triggerdown;
+                  stretchEndButtons: triggerup;
+                  colliderEvent: raycaster-intersection; 
+                  colliderEventProperty: els; 
+                  colliderEndEvent: raycaster-intersection-cleared; 
+                  colliderEndEventProperty: clearedEls;">
   </a-entity>
 
     <a-entity
         id="model"
-        position="0 1.5 -1"
         class="interactable"
         hoverable
         grabbable
@@ -101,7 +108,6 @@ if(modelUrl.length){
     model.setAttribute("gltf-model", modelUrl);
 
     model.addEventListener("model-loaded",()=>{
-        model.setAttribute('dynamic-body', 'shape: box');
         model.addState('interactable');
     });
 }else{

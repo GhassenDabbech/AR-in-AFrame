@@ -8,6 +8,7 @@
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/super-hands@3.0.6/dist/super-hands.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.3/dist/aframe-physics-system.min.js"></script>
 
     <style>
         html, body {
@@ -35,6 +36,7 @@
   <div id="qrcode" style="margin: 20px;"></div>
 
 <a-scene
+    physics="debug: false"
     renderer="alpha:true; colorManagement:true;"
     background="color: transparent"
     xr-mode-ui="XRMode: ar"
@@ -50,8 +52,8 @@
         position="-1 2 1">
     </a-light>
 
-    <a-entity laser-controls="hand: right" raycaster="objects: .interactable"></a-entity>
-    <a-entity laser-controls="hand: left" raycaster="objects: .interactable"></a-entity>
+    <a-entity laser-controls="hand: right" raycaster="objects: .interactable" super-hands></a-entity>
+    <a-entity laser-controls="hand: left" raycaster="objects: .interactable" super-hands></a-entity>
 
     <a-entity
         id="model"
@@ -111,4 +113,3 @@ scene.addEventListener("enter-vr",()=>{
 
 </body>
 </html>
-

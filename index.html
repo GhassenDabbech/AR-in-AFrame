@@ -7,6 +7,7 @@
     <!-- Neuere A-Frame Version -->
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/super-hands@3.0.6/dist/super-hands.min.js"></script>
 
     <style>
         html, body {
@@ -49,8 +50,15 @@
         position="-1 2 1">
     </a-light>
 
+    <a-entity laser-controls="hand: right" raycaster="objects: .interactable"></a-entity>
+    <a-entity laser-controls="hand: left" raycaster="objects: .interactable"></a-entity>
+
     <a-entity
         id="model"
+        class="interactable"
+        grabbable
+        stretchable
+        draggable
         position="0 1.5 -1"
         rotation="0 0 0"
         scale="1 1 1">

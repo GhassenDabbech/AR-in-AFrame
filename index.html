@@ -76,7 +76,6 @@
         grabbable
         stretchable
         draggable
-        static-body="shape: box"
         position="0 1.5 -1"
         rotation="0 0 0"
         scale="1 1 1">
@@ -92,6 +91,11 @@ const model = document.getElementById("model");
 
 if(modelUrl.length){
     model.setAttribute("gltf-model", modelUrl);
+
+    model.addEventListener("model-loaded",()=>{
+        model.setAttribute('static-body', 'shape: box');
+        model.addState('interactable');
+    });
 }else{
     alert("Kein Modell angegeben.");
 }

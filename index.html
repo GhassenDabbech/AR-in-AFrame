@@ -52,8 +52,17 @@
         position="-1 2 1">
     </a-light>
 
-    <a-entity laser-controls="hand: right" raycaster="objects: .interactable" super-hands></a-entity>
-    <a-entity laser-controls="hand: left" raycaster="objects: .interactable" super-hands></a-entity>
+    <a-entity
+      laser-controls="hand: right"
+      raycaster="objects: .interactable; far: 5; showLine: true;"
+      super-hands>
+    </a-entity>
+    
+    <a-entity
+      laser-controls="hand: left"
+      raycaster="objects: .interactable; far: 5; showLine: true;"
+      super-hands>
+  </a-entity>
 
     <a-entity
         id="model"
@@ -61,6 +70,7 @@
         grabbable
         stretchable
         draggable
+        static-body="shape: box"
         position="0 1.5 -1"
         rotation="0 0 0"
         scale="1 1 1">

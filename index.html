@@ -54,7 +54,7 @@
 
     <a-entity
       laser-controls="hand: right"
-      raycaster="objects: .interactable; far: 5; showLine: true;"
+      raycaster="objects: [gltf-model], .interactable; far: 5; showLine: true;"
       super-hands="colliderEvent: raycaster-intersection; 
                  colliderEventProperty: els; 
                  colliderEndEvent: raycaster-intersection-cleared; 
@@ -63,7 +63,7 @@
     
     <a-entity
       laser-controls="hand: left"
-      raycaster="objects: .interactable; far: 5; showLine: true;"
+      raycaster="objects: [gltf-model], .interactable; far: 5; showLine: true;"
       super-hands="colliderEvent: raycaster-intersection; 
                  colliderEventProperty: els; 
                  colliderEndEvent: raycaster-intersection-cleared; 

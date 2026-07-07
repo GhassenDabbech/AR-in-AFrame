@@ -84,7 +84,12 @@ scene.addEventListener("enter-vr",()=>{
     scene.renderer.setClearColor(0x000000,0);
 
 });
-
+//QR-Code generieren
+    new QRCode(document.getElementById("qrcode"), {
+        text: window.location.href, //holt die aktuelle URL
+        width: 400,
+        height: 400,
+    });
 </script>
 
 </body>

@@ -72,7 +72,9 @@
 
     <a-entity
         id="model"
+        position="0 1.5 -1"
         class="interactable"
+        hoverable
         grabbable
         stretchable
         draggable
@@ -99,7 +101,7 @@ if(modelUrl.length){
     model.setAttribute("gltf-model", modelUrl);
 
     model.addEventListener("model-loaded",()=>{
-        model.setAttribute('static-body', 'shape: box');
+        model.setAttribute('dynamic-body', 'shape: box');
         model.addState('interactable');
     });
 }else{

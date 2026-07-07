@@ -101,7 +101,7 @@ if(modelUrl.length){
     model.setAttribute("gltf-model", modelUrl);
 
     model.addEventListener("model-loaded",()=>{
-        model.setAttribute('kinematic-body', 'shape: box');
+        model.setAttribute('dynamic-body', 'shape: box');
         model.addState('interactable');
     });
 }else{

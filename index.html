@@ -55,13 +55,19 @@
     <a-entity
       laser-controls="hand: right"
       raycaster="objects: .interactable; far: 5; showLine: true;"
-      super-hands>
+      super-hands="colliderEvent: raycaster-intersection; 
+                 colliderEventProperty: els; 
+                 colliderEndEvent: raycaster-intersection-cleared; 
+                 colliderEndEventProperty: clearedEls;">
     </a-entity>
     
     <a-entity
       laser-controls="hand: left"
       raycaster="objects: .interactable; far: 5; showLine: true;"
-      super-hands>
+      super-hands="colliderEvent: raycaster-intersection; 
+                 colliderEventProperty: els; 
+                 colliderEndEvent: raycaster-intersection-cleared; 
+                 colliderEndEventProperty: clearedEls;">
   </a-entity>
 
     <a-entity

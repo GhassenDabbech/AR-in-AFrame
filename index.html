@@ -1,57 +1,92 @@
-<html>
 
+<!DOCTYPE html>
+<html lang="de">
 <head>
-  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <meta charset="UTF-8">
 
-  <style>
-    html, body, .a-canvas {
-      background-color: transparent !important;
-      background: transparent !important;
-    }
-  </style>
+    <!-- Neuere A-Frame Version -->
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+
+    <style>
+        html, body {
+            margin:0;
+            width:100%;
+            height:100%;
+            overflow:hidden;
+            background:transparent;
+        }
+
+        canvas{
+            background:transparent !important;
+        }
+    </style>
 </head>
 
 <body>
-  <a-scene
-    webxr= "mode: ar; requiredFeatures: local-floor; optionalFeatures: hit-test;"
-    vr-mode-ui="enterVR: false; enterAR: true"
-    renderer= "alpha: true; colorManagement: true clearColor: #000000; foveationLevel: 0;"
-    background= "transparent: true"
-    light= "defaultLightsEnabled: false">
 
-    <a-entity light="type: ambient; color: #BBB"></a-entity>
-    <a-entity light="type: directional; color: #FFF; intensity: 0.6" position="-0.5 1 1"></a-entity>
-    
-    <a-entity id="ar-viewer" position = "0 0 -1"></a-entity>
-  </a-scene>
-  
-  <script>
-  // Das "?" abschneiden und den Modell-url aus der Addresszeile auslesen (alles, was nach dem "?" steht)
-        const modelUrl = window.location.search.substring(1);
+<a-scene
+    renderer="alpha:true; colorManagement:true;"
+    background="color: transparent"
+    xr-mode-ui="XRMode: ar"
+    webxr="requiredFeatures: local-floor; optionalFeatures: hit-test">
 
-        //Das Model-Viewer Element über die ID holen
-        const viewer = document.getElementById('ar-viewer');
+    <a-camera position="0 1.6 0"></a-camera>
 
-        //Prüfen, ob eine valide Modell-url übergeben wurde
-        if (modelUrl && modelUrl.trim() !== "") {
-            viewer.setAttribute('gltf-model', modelUrl);
-        } else {
-            //Fehlermeldung, falls keine URL angegeben wurde
-            viewer.style.display = "none";
-            const errorDiv = document.createElement('div');
-            errorDiv.className = "error-message";
-            errorDiv.innerText = "Fehler: Kein 3D-Modell in der URL angegeben!";
-            document.body.appendChild(errorDiv);
-        }
+    <a-light type="ambient" intensity="1"></a-light>
 
-        document.querySelector('a-scene').addEventListener('enter-vr', function () {
-            if (this.is(ar-mode)){
-              const renderer = this.renderer;
-              renderer.setClearColor(0x000000, 0);
-              renderer.clear();
-            }
-        });
-  </script>
+    <a-light
+        type="directional"
+        intensity="1"
+        position="-1 2 1">
+    </a-light>
+
+    <a-entity
+        id="model"
+        position="0 1.5 -1"
+        rotation="0 0 0"
+        scale="1 1 1">
+    </a-entity>
+
+</a-scene>
+
+<script>
+
+const modelUrl = decodeURIComponent(location.search.substring(1));
+
+const model = document.getElementById("model");
+
+if(modelUrl.length){
+    model.setAttribute("gltf-model", modelUrl);
+}else{
+    alert("Kein Modell angegeben.");
+}
+
+const scene = document.querySelector("a-scene");
+
+scene.addEventListener("loaded",()=>{
+
+    // transparenter Hintergrund
+    scene.renderer.setClearColor(0x000000,0);
+
+    // VR-Button komplett deaktivieren
+    scene.setAttribute("vr-mode-ui","enabled:false");
+
+});
+
+scene.addEventListener("enter-vr",()=>{
+
+    // Falls versehentlich VR gestartet wird -> sofort wieder verlassen
+    if(scene.is("vr-mode") && !scene.is("ar-mode")){
+        scene.exitVR();
+        return;
+    }
+
+    scene.renderer.setClearColor(0x000000,0);
+
+});
+
+</script>
+
 </body>
-
 </html>
+

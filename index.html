@@ -6,6 +6,7 @@
 
     <!-- Neuere A-Frame Version -->
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         html, body {
@@ -19,10 +20,18 @@
         canvas{
             background:transparent !important;
         }
+
+        #qrcode {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+        }
     </style>
 </head>
 
 <body>
+  <div id="qrcode" style="margin: 20px;"></div>
 
 <a-scene
     renderer="alpha:true; colorManagement:true;"

@@ -38,6 +38,13 @@
         webxr="requiredFeatures: hand-tracking, local-floor; optionalFeatures: hit-test">
 
         <a-camera position="0 1.6 0"></a-camera>
+        
+        <a-entity id="debug-text" 
+          position="0 0 -0.5" 
+          text="value: Waiting for input...; align: center; color: white;" 
+          geometry="primitive: plane; width: 0.5; height: 0.1"
+          material="color: #333">
+        </a-entity>
 
         <a-light type="ambient" intensity="1"></a-light>
 
@@ -55,6 +62,10 @@
     </a-scene>
 
     <script>
+        function logToVR(msg) {
+            const debugText = document.getElementById("debug-text");
+            debugText.setAttribute("text", "value: " + msg);
+        }
 
         const modelUrl = decodeURIComponent(location.search.substring(1));
         const model = document.getElementById("model");
@@ -81,8 +92,11 @@
             hands.forEach(hand => {
                 //Grab model
                 hand.addEventListener('pinchstarted', () => {
-                    if (heldObject) return; //don't grab if already holding sth.
-                    
+                    logToVR("Pinch detected");
+                    if (heldObject) {
+                        logToVR("Already holding an object.");
+                        return; //don't grab if already holding sth.
+                    }
                     const interactables = document.querySelectorAll('.interactive');
                     let closest = null;
                     let minDistance = 0.5;

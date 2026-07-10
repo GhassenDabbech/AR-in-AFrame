@@ -96,11 +96,13 @@
                         return; //don't grab if already holding sth.
                     }
                     const interactables = document.querySelectorAll('.interactive');
-                    let closest = null;
-                    let minDistance = 0.5;
+                    const handPos = new THREE.Vector3();
+                    hand.object3D.getWorldPosition(handPos);
 
                     interactables.forEach(obj => {
-                        const dist = hand.object3D.position.distanceTo(obj.object3D.position);
+                        const objPos = new THREE.Vector3();
+                        obj.object3D.getWorldPosition(objPos);
+                        const dist = handPos.distanceTo(objPos);
 
                         logToVR("Dist: " + dist.toFixed(2));
 

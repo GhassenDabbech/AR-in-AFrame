@@ -93,30 +93,33 @@
                 const hands = document.querySelectorAll('[hand-tracking-controls]');
                 const interactables = document.querySelectorAll('.interactive');
 
-                hands.forEach(hand => {
-                    // Check if hand is tracked
-                    if (!hand.components['hand-tracking-controls'] || !hand.components['hand-tracking-controls'].data) return;
+                // FORCE LOG: Are hands detected?
+                if (hands.length === 0) {
+                    logToVR("No hands found");
+                } else {
+                    hands.forEach(hand => {
+                        const handMesh = hand.getObject3D('mesh');
+                        if (!handMesh) {
+                            logToVR("No hand mesh");
+                            return;
+                        }
 
-                    const handMesh = hand.getObject3D('mesh');
-                    if (!handMesh) return;
-                    const handPos = new THREE.Vector3();
-                    handMesh.getWorldPosition(handPos);
+                        const handPos = new THREE.Vector3();
+                        handMesh.getWorldPosition(handPos);
 
-                    interactables.forEach(obj => {
                         const objPos = new THREE.Vector3();
-                        obj.object3D.getWorldPosition(objPos);
-                        const dist = handPos.distanceTo(objPos);
+                        interactables[0].object3D.getWorldPosition(objPos);
                         
-                        // If we are getting here, this will show the distance
+                        const dist = handPos.distanceTo(objPos);
                         logToVR("Dist: " + dist.toFixed(2));
 
-                        if (dist < 0.25 && !heldObject) {
-                            heldObject = obj;
+                        if (dist < 0.5 && !heldObject) {
+                            heldObject = interactables[0];
                             hand.object3D.attach(heldObject.object3D);
                             logToVR("Grabbed!");
                         }
                     });
-                });
+                }
                 requestAnimationFrame(updateLoop);
             }
             scene.addEventListener("enter-vr", updateLoop, { once: true });

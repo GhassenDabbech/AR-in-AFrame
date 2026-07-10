@@ -51,8 +51,8 @@
         <a-entity class="hand" hand-tracking-controls="hand: right" sphere-collider="objects: .magnet-target;">
         </a-entity>
 
-        <a-entity id="model" position="0 1.5 -1" rotation="0 0 0" scale="1 1 1" magnet-target="colliderEntities: .hand"
-            class="magnet-target">
+        <a-entity id="model" position="0 1.5 -1" rotation="0 0 0" scale="1 1 1" class="magnet-target" magnet-target="colliderEntities: .hand" grabbable>
+        </a-entity>
 
             <a-box scale="1 1 1" opacity="0.5" color="red">
             </a-box>

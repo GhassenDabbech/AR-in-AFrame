@@ -51,7 +51,7 @@
         <a-entity class="hand" hand-tracking-controls="hand: right" sphere-collider="objects: .magnet-target;">
         </a-entity>
 
-        <a-entity id="model" position="0 1.5 -1" rotation="0 0 0" scale="1 1 1" class="magnet-target" magnet-target="colliderEntities: .hand" grabbable>
+        <a-entity id="model" position="0 1.5 -1" rotation="0 0 0" scale="1 1 1">
             <a-box scale="1 1 1" opacity="0.5" color="red">
             </a-box>
         </a-entity>
@@ -109,6 +109,46 @@
                     handyWork.start();
                 }
             }, 1000);
+        });
+
+        document.querySelector('a-scene').addEventListener('loaded', () => {
+            const model = document.getElementById('model');
+            const hands = document.querySelectorAll('[hand-tracking-controls]');
+
+            hands.forEach(hand => {
+                hand.addEventListener('pinchstarted', () => {
+                    if (hand.object3D.position.distanceTo(model.object3D.position) < 0.5) {
+                        hand.object3D.attach(model.object3D);
+                    } else {
+                        const pos = hand.object3D.position;
+                        model.setAttribute('animation', {
+                            property: 'position',
+                            to: `${pos.x} ${pos.y} ${pos.z}`,
+                            dur: 600,
+                            easing: 'easeOutQuad'
+                        });
+                    }
+                })
+
+                hand.addEventListener('pinchended', () => {
+                    if (model.object3D.parent === hand.object3D) {
+                        document.querySelector('a-scene').object3D.attach(model.object3D);
+                    }
+                });
+            });
+
+            document.querySelector('a-scene').addBehavior({
+                tick: function(){
+                    const h1 = hands[0].object3D.position;
+                    const h2 = hands[1].object3D.position;
+                    const dist = h1.distanceTo(h2);
+
+                    if (dist > 0.1 && dist < 0.8) {
+                        const scale = dist * 1.5;
+                        model.object3D.scale.set(scale, scale, scale);
+                    }
+                }
+            })
         });
     </script>
 

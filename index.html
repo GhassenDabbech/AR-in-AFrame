@@ -37,14 +37,14 @@
     <a-scene renderer="alpha:true; colorManagement:true;" background="color: transparent" xr-mode-ui="XRMode: ar"
         webxr="requiredFeatures: hand-tracking, local-floor; optionalFeatures: hit-test">
 
-        <a-camera position="0 1.6 0"></a-camera>
-        
-        <a-entity id="debug-text" 
-          position="0 0 -0.5" 
-          text="value: Waiting for input...; align: center; color: white;" 
-          geometry="primitive: plane; width: 0.5; height: 0.1"
-          material="color: #333">
-        </a-entity>
+        <a-camera position="0 1.6 0">
+            <a-entity id="debug-text"
+                      position="0 0 -0.5" 
+                      text="value: Waiting for input...; align: center; color: white;" 
+                      geometry="primitive: plane; width: 0.5; height: 0.1"
+                      material="color: #333">
+            </a-entity>
+        </a-camera>
 
         <a-light type="ambient" intensity="1"></a-light>
 
@@ -112,6 +112,7 @@
                     if (closest) {
                         heldObject = closest;
                         hand.object3D.attach(heldObject.object3D);
+                        logToVR("Object grabbed.");
                         }
                 });
 
@@ -120,6 +121,7 @@
                     if (heldObject) {
                         document.querySelector('a-scene').object3D.attach(heldObject.object3D);
                         heldObject = null;
+                        logToVR("Object released.");
                     }
                 });
             });

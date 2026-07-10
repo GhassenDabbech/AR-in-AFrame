@@ -45,13 +45,13 @@
         <a-light type="directional" intensity="1" position="-1 2 1">
         </a-light>
 
-        <a-entity class="hands" hand-tracking-controls="hand: left">
+        <a-entity class="hand" hand-tracking-controls="hand: left" sphere-collider="objects: .magnet-target;">
         </a-entity>
 
-        <a-entity class="hands" hand-tracking-controls="hand: right">
+        <a-entity class="hand" hand-tracking-controls="hand: right" sphere-collider="objects: .magnet-target;">
         </a-entity>
 
-        <a-entity id="model" position="0 1.5 -1" rotation="0 0 0" scale="1 1 1" magnet-target="colliderEntities: .hands"
+        <a-entity id="model" position="0 1.5 -1" rotation="0 0 0" scale="1 1 1" magnet-target="colliderEntities: .hand"
             class="magnet-target">
 
             <a-box scale="1 1 1" opacity="0.5" color="red">
@@ -106,9 +106,11 @@
         });
 
         document.querySelector('a-scene').addEventListener('loaded', () => {
-            if (typeof handyWork !== 'undefined'){
-                handyWork.start();
-            }
+            setTimeout(() => {
+                if (typeof handyWork !== 'undefined') {
+                    handyWork.start();
+                }
+            }, 1000);
         });
     </script>
 

@@ -95,7 +95,7 @@
 
                 hands.forEach(hand => {
                     const handPos = new THREE.Vector3();
-                    hand.object3D.getWorldPosition(handPos);
+                    hand.components['hand-tracking-controls'].controller.children[0].getWorldPosition(handPos);
 
                     interactables.forEach(obj => {
                         const objPos = new THREE.Vector3();

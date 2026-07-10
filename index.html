@@ -91,31 +91,45 @@
             let heldObject = null; //relevant für später, wenn wir mehrere Objekte haben.
 
             function updateLoop() {
-                const hands = document.querySelectorAll('[hand-tracking-controls]');
                 const interactables = document.querySelectorAll('.interactive');
+                
+                // Get the WebXR session
+                const session = scene.xrSession;
+                if (!session || !session.inputSources) {
+                    logToVR("No XR Session");
+                    requestAnimationFrame(updateLoop);
+                    return;
+                }
 
-                if (hands.length === 0 || interactables.length === 0) {
-                    logToVR("Waiting for input...");
+                // Find hands in input sources
+                const hands = session.inputSources.filter(s => s.hand);
+                
+                if (hands.length === 0) {
+                    logToVR("Hands not detected");
                 } else {
-                    hands.forEach(hand => {
-                        const handPos = new THREE.Vector3();
-                        hand.object3D.getWorldPosition(handPos);
-                        
-                        // Check if hand is actually active (not at 0,0,0)
-                        if (handPos.length() < 0.1) return;
+                    // Just take the first hand (e.g., right hand)
+                    const hand = hands[0];
+                    const frame = scene.frame;
+                    const refSpace = scene.renderer.xr.getReferenceSpace();
 
-                        const objPos = new THREE.Vector3();
-                        interactables[0].object3D.getWorldPosition(objPos);
-                        
-                        const dist = handPos.distanceTo(objPos);
-                        logToVR("Dist: " + dist.toFixed(2));
+                    if (frame && hand.gripSpace) {
+                        const pose = frame.getPose(hand.gripSpace, refSpace);
+                        if (pose) {
+                            const handPos = new THREE.Vector3().setFromMatrixPosition(pose.transform.matrix);
+                            const objPos = new THREE.Vector3();
+                            interactables[0].object3D.getWorldPosition(objPos);
+                            
+                            const dist = handPos.distanceTo(objPos);
+                            logToVR("Dist: " + dist.toFixed(2));
 
-                        if (dist < 0.5 && !heldObject) {
-                            heldObject = interactables[0];
-                            hand.object3D.attach(heldObject.object3D);
-                            logToVR("Grabbed!");
+                            if (dist < 0.25) {
+                                logToVR("Grabbed!");
+                                // Simple parent attachment
+                                interactables[0].object3D.position.set(0, 0, 0);
+                                hand.object3D.attach(interactables[0].object3D); // This might need a helper
+                            }
                         }
-                    });
+                    }
                 }
                 requestAnimationFrame(updateLoop);
             }

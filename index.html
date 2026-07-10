@@ -94,18 +94,18 @@
                 const interactables = document.querySelectorAll('.interactive');
 
                 hands.forEach(hand => {
+                    const controller = hand.components['hand-tracking-controls']?.controller;
+                    if (!controller) return; 
+
                     const handPos = new THREE.Vector3();
-                    hand.components['hand-tracking-controls'].controller.children[0].getWorldPosition(handPos);
+                    controller.getWorldPosition(handPos);
 
                     interactables.forEach(obj => {
                         const objPos = new THREE.Vector3();
                         obj.object3D.getWorldPosition(objPos);
                         const dist = handPos.distanceTo(objPos);
                         
-                        // Only update text if hand is actually tracked
-                        if (hand.components['hand-tracking-controls'].data) {
-                            logToVR("Dist: " + dist.toFixed(2));
-                        }
+                        logToVR("Dist: " + dist.toFixed(2));
 
                         if (dist < 0.2 && !heldObject) {
                             heldObject = obj;

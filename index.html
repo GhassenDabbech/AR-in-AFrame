@@ -57,15 +57,10 @@
     <script>
 
         const modelUrl = decodeURIComponent(location.search.substring(1));
-
         const model = document.getElementById("model");
 
         if (modelUrl.length) {
             model.setAttribute("gltf-model", modelUrl);
-
-            model.addEventListener("model-loaded", () => {
-                model.addState('interactable');
-            });
         } else {
             alert("Kein Modell angegeben.");
         }
@@ -73,13 +68,34 @@
         const scene = document.querySelector("a-scene");
 
         scene.addEventListener("loaded", () => {
-
             // transparenter Hintergrund
             scene.renderer.setClearColor(0x000000, 0);
 
             // VR-Button komplett deaktivieren
             scene.setAttribute("vr-mode-ui", "enabled:false");
 
+            const hands = document.querySelectorAll('[hand-tracking-controls]');
+
+            hands.forEach(hand => {
+                //Grab model
+                hand.addEventListener('pinchstarted', () => {
+                    if (hand.object3D.position.distanceTo(model.object3D.position) < 0.5){
+                        hand.object3D.attach(model.object3D);
+                    }
+                });
+
+                //Release model
+                hand.addEventListener('pinchended', () => {
+                    if (model.object3D.parent === hand.object3D) {
+                        const worldPos = new THREE.Vector3();
+                        model.object3D.getWorldPosition(worldPos);
+
+                        document.querySelector('a-scene').object3D.attach(model.object3D);
+
+                        model.object3D.position.copy(worldPos);
+                    }
+                })
+            })
         });
 
         scene.addEventListener("enter-vr", () => {
@@ -98,54 +114,6 @@
             text: window.location.href, //holt die aktuelle URL
             width: 300,
             height: 300,
-        });
-
-        document.querySelector('a-scene').addEventListener('loaded', () => {
-            const model = document.getElementById('model');
-            const hands = document.querySelectorAll('[hand-tracking-controls]');
-
-            hands.forEach(hand => {
-                hand.addEventListener('pinchstarted', () => {
-                    if (hand.object3D.position.distanceTo(model.object3D.position) < 0.5) {
-                        hand.object3D.attach(model.object3D);
-                        model.setAttribute('animation__hover', 'enabled', false);
-                    } else {
-                        const pos = hand.object3D.position;
-                        model.setAttribute('animation', {
-                            property: 'position',
-                            to: `${pos.x} ${pos.y} ${pos.z}`,
-                            dur: 600,
-                            easing: 'easeOutQuad'
-                        });
-                    }
-                })
-
-                hand.addEventListener('pinchended', () => {
-                    if (model.object3D.parent === hand.object3D) {
-                        const worldPos = new THREE.Vector3();
-                        model.object3D.getWorldPosition(worldPos);
-
-                        document.querySelector('a-scene').object3D.attach(model.object3D);
-
-                        model.object3D.position.copy(worldPos);
-
-                        model.setAttribute('animation__hover', 'enabled', true);
-                    }
-                });
-            });
-
-            document.querySelector('a-scene').addBehavior({
-                tick: function(){
-                    const h1 = hands[0].object3D.position;
-                    const h2 = hands[1].object3D.position;
-                    const dist = h1.distanceTo(h2);
-
-                    if (dist > 0.1 && dist < 0.8) {
-                        const scale = dist * 1.5;
-                        model.object3D.scale.set(scale, scale, scale);
-                    }
-                }
-            })
         });
     </script>
 

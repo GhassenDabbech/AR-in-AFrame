@@ -89,13 +89,11 @@
 
             let heldObject = null; //relevant für später, wenn wir mehrere Objekte haben.
 
-            hands.forEach(hand => {
-                //Grab model
-                hand.addEventListener('tick', () => {
-                    if (heldObject) {
-                        return; //don't grab if already holding sth.
-                    }
-                    const interactables = document.querySelectorAll('.interactive');
+            function updateLoop() {
+                const hands = document.querySelectorAll('[hand-tracking-controls]');
+                const interactables = document.querySelectorAll('.interactive');
+
+                hands.forEach(hand => {
                     const handPos = new THREE.Vector3();
                     hand.object3D.getWorldPosition(handPos);
 
@@ -103,26 +101,23 @@
                         const objPos = new THREE.Vector3();
                         obj.object3D.getWorldPosition(objPos);
                         const dist = handPos.distanceTo(objPos);
+                        
+                        // Only update text if hand is actually tracked
+                        if (hand.components['hand-tracking-controls'].data) {
+                            logToVR("Dist: " + dist.toFixed(2));
+                        }
 
-                        logToVR("Dist: " + dist.toFixed(2));
-
-                        if (dist < 0.2) {
+                        if (dist < 0.2 && !heldObject) {
                             heldObject = obj;
                             hand.object3D.attach(heldObject.object3D);
-                            logToVR("Object auto-grabbed!");
+                            logToVR("Grabbed!");
                         }
                     });
                 });
+                requestAnimationFrame(updateLoop);
+            }
+            scene.addEventListener("enter-vr", updateLoop, { once: true });
 
-                //Release model
-                hand.addEventListener('pinchended', () => {
-                    if (heldObject) {
-                        document.querySelector('a-scene').object3D.attach(heldObject.object3D);
-                        heldObject = null;
-                        logToVR("Object released.");
-                    }
-                });
-            });
         });
         scene.addEventListener("enter-vr", () => {
 

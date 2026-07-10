@@ -6,7 +6,6 @@
 
     <!-- Neuere A-Frame Version -->
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-    <script src="https://gcdn.psti.in/handy-work.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -51,8 +50,7 @@
         <a-entity class="hand" hand-tracking-controls="hand: right">
         </a-entity>
 
-        <a-entity id="model" position="0 1.5 -1" rotation="0 0 0" scale="0.1 0.1 0.1"
-        animation__hover="property: position; to: 0 1.6 -1; dir: alternate; dur: 2000; loop: true; easing: easeInOutSine">
+        <a-entity id="model" position="0 1.5 -1" rotation="0 0 0" scale="0.1 0.1 0.1">
         </a-entity>
     </a-scene>
 
@@ -100,14 +98,6 @@
             text: window.location.href, //holt die aktuelle URL
             width: 300,
             height: 300,
-        });
-
-        document.querySelector('a-scene').addEventListener('loaded', () => {
-            setTimeout(() => {
-                if (typeof handyWork !== 'undefined') {
-                    handyWork.start();
-                }
-            }, 1000);
         });
 
         document.querySelector('a-scene').addEventListener('loaded', () => {

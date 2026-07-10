@@ -104,6 +104,12 @@
             width: 300,
             height: 300,
         });
+
+        document.querySelector('a-scene').addEventListener('loaded', () => {
+            if (typeof handyWork !== 'undefined'){
+                handyWork.start();
+            }
+        });
     </script>
 
 </body>

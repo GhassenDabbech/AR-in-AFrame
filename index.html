@@ -94,20 +94,23 @@
                 const interactables = document.querySelectorAll('.interactive');
 
                 hands.forEach(hand => {
-                    const controller = hand.components['hand-tracking-controls']?.controller;
-                    if (!controller) return; 
+                    // Check if hand is tracked
+                    if (!hand.components['hand-tracking-controls'] || !hand.components['hand-tracking-controls'].data) return;
 
+                    const handMesh = hand.getObject3D('mesh');
+                    if (!handMesh) return;
                     const handPos = new THREE.Vector3();
-                    controller.getWorldPosition(handPos);
+                    handMesh.getWorldPosition(handPos);
 
                     interactables.forEach(obj => {
                         const objPos = new THREE.Vector3();
                         obj.object3D.getWorldPosition(objPos);
                         const dist = handPos.distanceTo(objPos);
                         
+                        // If we are getting here, this will show the distance
                         logToVR("Dist: " + dist.toFixed(2));
 
-                        if (dist < 0.2 && !heldObject) {
+                        if (dist < 0.25 && !heldObject) {
                             heldObject = obj;
                             hand.object3D.attach(heldObject.object3D);
                             logToVR("Grabbed!");

@@ -101,6 +101,9 @@
 
                     interactables.forEach(obj => {
                         const dist = hand.object3D.position.distanceTo(obj.object3D.position);
+
+                        logToVR("Dist: " + dist.toFixed(2));
+
                         if (dist < 0.2) {
                             heldObject = obj;
                             hand.object3D.attach(heldObject.object3D);
@@ -108,7 +111,7 @@
                         }
                     });
                 });
-                
+
                 //Release model
                 hand.addEventListener('pinchended', () => {
                     if (heldObject) {

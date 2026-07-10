@@ -45,14 +45,15 @@
         <a-light type="directional" intensity="1" position="-1 2 1">
         </a-light>
 
-        <a-entity class="hand" hand-tracking-controls="hand: left" sphere-collider="objects: .magnet-target;">
+        <a-entity class="hand" hand-tracking-controls="hand: left">
         </a-entity>
 
-        <a-entity class="hand" hand-tracking-controls="hand: right" sphere-collider="objects: .magnet-target;">
+        <a-entity class="hand" hand-tracking-controls="hand: right">
         </a-entity>
 
-        <a-entity id="model" position="0 1.5 -1" rotation="0 0 0" scale="0.1 0.1 0.1">
-        </a-entity>
+        <a-entity id="model" position="0 1.5 -1" rotation="0 0 0" scale="0.1 0.1 0.1"
+        animation=""property: position; to 0 1.5 -1; dir: alternate; dur: 2000; loop: true; easing: easeInOutSine">
+        </a-entity>>
     </a-scene>
 
     <script>
@@ -130,7 +131,12 @@
 
                 hand.addEventListener('pinchended', () => {
                     if (model.object3D.parent === hand.object3D) {
+                        const worldPos = new THREE.Vector3();
+                        model.object3D.getWorldPosition(worldPos);
+
                         document.querySelector('a-scene').object3D.attach(model.object3D);
+
+                        model.object3D.position.copy(worldPos);
                     }
                 });
             });

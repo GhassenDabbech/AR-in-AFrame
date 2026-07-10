@@ -118,6 +118,7 @@
                 hand.addEventListener('pinchstarted', () => {
                     if (hand.object3D.position.distanceTo(model.object3D.position) < 0.5) {
                         hand.object3D.attach(model.object3D);
+                        model.setAttribute('animation', 'enabled', false);
                     } else {
                         const pos = hand.object3D.position;
                         model.setAttribute('animation', {
@@ -137,6 +138,8 @@
                         document.querySelector('a-scene').object3D.attach(model.object3D);
 
                         model.object3D.position.copy(worldPos);
+
+                        model.setAttribute('animation', 'enabled', false);
                     }
                 });
             });

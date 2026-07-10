@@ -6,13 +6,9 @@
 
     <!-- Neuere A-Frame Version -->
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-    <script>
-      delete AFRAME.components["grabbable"];
-    </script>
+    <script src="https://gcdn.psti.in/handy-work.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://unpkg.com/super-hands@3.0.6/dist/super-hands.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.3/dist/aframe-physics-system.min.js"></script>
-
+    
     <style>
         html, body {
             margin:0;
@@ -39,11 +35,10 @@
   <div id="qrcode" style="margin: 20px;"></div>
 
 <a-scene
-    physics="gravity: 0"
     renderer="alpha:true; colorManagement:true;"
     background="color: transparent"
     xr-mode-ui="XRMode: ar"
-    webxr="requiredFeatures: local-floor; optionalFeatures: hit-test">
+    webxr="requiredFeatures: hand-tracking, local-floor; optionalFeatures: hit-test">
 
     <a-camera position="0 1.6 0"></a-camera>
 
@@ -55,34 +50,22 @@
         position="-1 2 1">
     </a-light>
 
-    <a-entity
-      laser-controls="hand: right"
-      raycaster="objects: .interactable; showLine: true;"
-      super-hands="grabStartButtons: triggerdown; 
-                  grabEndButtons: triggerup;">
+    <a-entity class="hands" hand-tracking-controls="hand: left">
     </a-entity>
     
-    <a-entity
-      laser-controls="hand: left"
-      raycaster="objects: .interactable; far: 5; showLine: true;"
-      super-hands="objects: .interactable; showLine: true;"
-      super-hands="grabStartButtons: triggerdown; 
-                  grabEndButtons: triggerup;">
+    <a-entity class="hands" hand-tracking-controls="hand: right">
   </a-entity>
 
     <a-entity
         id="model"
-        class="interactable
-        hoverable
-        grabbable
-        stretchable
-        draggable
         position="0 1.5 -1"
         rotation="0 0 0"
-        scale="1 1 1">
+        scale="1 1 1"
+        
+        magnet-target="colliderEntities: .hands"
+        class="magnet-target">
 
         <a-box
-            class="interactable"
             scale="1 1 1"
             opacity="0.5"
             color="red">

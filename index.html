@@ -79,7 +79,7 @@
             hands.forEach(hand => {
                 //Grab model
                 hand.addEventListener('pinchstarted', () => {
-                    if (hand.object3D.position.distanceTo(model.object3D.position) < 0.5){
+                    if (hand.object3D.position.distanceTo(model.object3D.position) < 2.0){
                         hand.object3D.attach(model.object3D);
                     }
                 });

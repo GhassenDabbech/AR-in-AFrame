@@ -93,19 +93,19 @@
                 const hands = document.querySelectorAll('[hand-tracking-controls]');
                 const interactables = document.querySelectorAll('.interactive');
 
-                // FORCE LOG: Are hands detected?
+                //Are hands detected?
                 if (hands.length === 0) {
                     logToVR("No hands found");
                 } else {
                     hands.forEach(hand => {
-                        const handMesh = hand.getObject3D('mesh');
-                        if (!handMesh) {
-                            logToVR("No hand mesh");
-                            return;
-                        }
-
-                        const handPos = new THREE.Vector3();
-                        handMesh.getWorldPosition(handPos);
+                        const handMesh = hand.object3D.children.find(child => child.type === 'SkinnedMesh') || hand.getObject3D('mesh');
+                    if (!handMesh) {
+                        logToVR("Scanning...");
+                        return; //keeps loop looping until hand appears
+                    }
+                    
+                    const handPos = new THREE.Vector3();
+                    handMesh.getWorldPosition(handPos);
 
                         const objPos = new THREE.Vector3();
                         interactables[0].object3D.getWorldPosition(objPos);

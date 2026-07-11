@@ -88,19 +88,20 @@
             return new THREE.Vector3().setFromMatrixPosition(new THREE.Matrix4().fromArray(pose.transform.matrix));
         }
 
-        function isFist(hand, frame, refSpace) {
+        function fistDistance(hand, frame, refSpace) {
             const wrist = hand.get("wrist");
             const indexTip = hand.get("index-finger-tip");
             const middleTip = hand.get("middle-finger-tip");
-            if (!wrist || !indexTip || !middleTip) return false;
+            if (!wrist || !indexTip || !middleTip) return null;
 
             const wristPos = jointPos(wrist, frame, refSpace);
             const indexPos = jointPos(indexTip, frame, refSpace);
             const middlePos = jointPos(middleTip, frame, refSpace);
-            if (!wristPos || !indexPos || !middlePos) return false;
+            if (!wristPos || !indexPos || !middlePos) return null;
 
-            const avgDist = (wristPos.distanceTo(indexPos) + wristPos.distanceTo(middlePos)) / 2;
-            return avgDist < 0.06; // closed fist - tune this number on device
+            return (wristPos.distanceTo(indexPos) + wristPos.distanceTo(middlePos)) / 2;
+            //const avgDist = (wristPos.distanceTo(indexPos) + wristPos.distanceTo(middlePos)) / 2;
+            //return avgDist < 0.06;
         }
 
         scene.renderer.setAnimationLoop((time, frame) => {
@@ -110,17 +111,11 @@
 
             for (const source of xrSession.inputSources) {
                 if (!source.hand) continue;
-                const closed = isFist(source.hand, frame, refSpace);
-
-                if (source.handedness === "left") {
-                    if (closed && !leftClosed) grab(leftHand);  //means it's a fist now, but wasn't a fist last frame
-                    if (!closed && leftClosed) release(leftHand);
-                    leftClosed = closed;
-                } else if (source.handedness === "right") {
-                    if (closed && !rightClosed) grab(rightHand);
-                    if (!closed && rightClosed) release(rightHand);
-                    rightClosed = closed;
-                }
+                const dist = fistDistance(source.hand, frame, refSpace);
+                if (dist === null) continue;
+                
+                logToVR(source.handedness + ": " + dist.toFixed(3));
+                //const closed = isFist(source.hand, frame, refSpace);
             }
         });
 

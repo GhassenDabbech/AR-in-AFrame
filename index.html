@@ -104,26 +104,39 @@
             //return avgDist < 0.06;
         }
 
-        AFRAME.registerComponent("hand-debug", {
-    tick: function () {
-        const frame = scene.frame;
-        if (!frame) return;
+        const FIST_THRESHOLD = 0.13;
 
-        const xrSession = scene.renderer.xr.getSession();
-        if (!xrSession) return;
-        const refSpace = scene.renderer.xr.getReferenceSpace();
+        AFRAME.registerComponent("hand-grabber", {
+            tick: function () {
+                const frame = scene.frame;
+                if (!frame) return;
 
-        for (const source of xrSession.inputSources) {
-            if (!source.hand) continue;
-            const dist = fistDistance(source.hand, frame, refSpace);
-            if (dist === null) continue;
+            const xrSession = scene.renderer.xr.getSession();
+            if (!xrSession) return;
+            const refSpace = scene.renderer.xr.getReferenceSpace();
 
-            logToVR(source.handedness + ": " + dist.toFixed(3));
+            for (const source of xrSession.inputSources) {
+                if (!source.hand) continue;
+                const dist = fistDistance(source.hand, frame, refSpace);
+                if (dist === null) continue;
+
+                const closed = dist < FIST_THRESHOLD;
+
+                if (source.handedness === "left") {
+                    if (closed && !leftClosed) grab(leftHand); //means hand is a fist now, but wasn't before
+                    if (!closed && leftClosed) release(leftHand);
+                    leftClosed = closed;
+                } else if (source.handedness === "right") {
+                    if (closed && !rightClosed) grab(rightHand);
+                    if (!closed && rightClosed) release(rightHand);
+                    rightClosed = closed;
+                }
+            }
         }
-    }
-});
+    });
 
-scene.setAttribute("hand-debug", "")
+    scene.setAttribute("hand-grabber", "");
+
 
         function grab(handEl) {
             if (grabbed) return;

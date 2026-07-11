@@ -104,20 +104,26 @@
             //return avgDist < 0.06;
         }
 
-        scene.renderer.setAnimationLoop((time, frame) => {
-            const xrSession = scene.renderer.xr.getSession();
-            if (!xrSession) return;
-            const refSpace = scene.renderer.xr.getReferenceSpace();
+        AFRAME.registerComponent("hand-debug", {
+    tick: function () {
+        const frame = scene.frame;
+        if (!frame) return;
 
-            for (const source of xrSession.inputSources) {
-                if (!source.hand) continue;
-                const dist = fistDistance(source.hand, frame, refSpace);
-                if (dist === null) continue;
-                
-                logToVR(source.handedness + ": " + dist.toFixed(3));
-                //const closed = isFist(source.hand, frame, refSpace);
-            }
-        });
+        const xrSession = scene.renderer.xr.getSession();
+        if (!xrSession) return;
+        const refSpace = scene.renderer.xr.getReferenceSpace();
+
+        for (const source of xrSession.inputSources) {
+            if (!source.hand) continue;
+            const dist = fistDistance(source.hand, frame, refSpace);
+            if (dist === null) continue;
+
+            logToVR(source.handedness + ": " + dist.toFixed(3));
+        }
+    }
+});
+
+scene.setAttribute("hand-debug", "")
 
         function grab(handEl) {
             if (grabbed) return;

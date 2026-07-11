@@ -121,6 +121,7 @@
                 if (dist === null) continue;
 
                 const closed = dist < FIST_THRESHOLD;
+                logToVR(source.handedness + " fist:" + closed + " (" + dist.toFixed(3) + ")");
 
                 if (source.handedness === "left") {
                     if (closed && !leftClosed) grab(leftHand); //means hand is a fist now, but wasn't before

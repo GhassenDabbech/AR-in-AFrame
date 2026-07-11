@@ -139,29 +139,33 @@
     scene.setAttribute("hand-grabber", "");
 
 
-        function grab(handEl) {
-            if (grabbed) return;
-            
-            const handPos = new THREE.Vector3();
-            handEl.object3D.getWorldPosition(handPos);
+    function grab(handEl) {
+        if (grabbed) return;
 
-            const modelPos = new THREE.Vector3();
-            model.object3D.getWorldPosition(modelPos);
+        const wristObj = handEl.object3D.getObjectByName("wrist");
+        if (!wristObj) return;
 
-            const dist = handPos.distanceTo(modelPos);
-            if (dist < grabDist) {
-                grabbed = handEl.object3D;
-                handEl.object3D.attach(model.object3D);
-                logToVR("Grabbed!");
-            }
-        }
+        const handPos = new THREE.Vector3();
+        wristObj.getWorldPosition(handPos);
 
-        function release(handEl) {
-            if (grabbed !== handEl.object3D) return;
-            scene.object3D.attach(model.object3D);
-            grabbed = null;
-            logToVR("Released");
-        }
+        const modelPos = new THREE.Vector3();
+        model.object3D.getWorldPosition(modelPos);
+
+        const dist = handPos.distanceTo(modelPos);
+        if (dist < grabDist) {
+            grabbed = wristObj;
+            wristObj.attach(model.object3D);
+            logToVR("Grabbed!");
+    }
+}
+
+    function release(handEl) {
+        const wristObj = handEl.object3D.getObjectByName("wrist");
+        if (grabbed !== wristObj) return;
+        scene.object3D.attach(model.object3D);
+        grabbed = null;
+        logToVR("Released");
+    }
 
         scene.addEventListener("enter-vr", () => {
             // Falls versehentlich VR gestartet wird -> sofort wieder verlassen

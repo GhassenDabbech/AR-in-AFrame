@@ -79,6 +79,51 @@
             debugText.setAttribute("text", "value: " + msg);
         }
 
+        let leftClosed = false;
+        let rightClosed = false;
+
+        function jointPos(joint, frame, refSpace) {
+            const pose = frame.getJointPose(joint, refSpace);
+            if (!pose) return null;
+            return new THREE.Vector3().setFromMatrixPosition(new THREE.Matrix4().fromArray(pose.transform.matrix));
+        }
+
+        function isFist(hand, frame, refSpace) {
+            const wrist = hand.get("wrist");
+            const indexTip = hand.get("index-finger-tip");
+            const middleTip = hand.get("middle-finger-tip");
+            if (!wrist || !indexTip || !middleTip) return false;
+
+            const wristPos = jointPos(wrist, frame, refSpace);
+            const indexPos = jointPos(indexTip, frame, refSpace);
+            const middlePos = jointPos(middleTip, frame, refSpace);
+            if (!wristPos || !indexPos || !middlePos) return false;
+
+            const avgDist = (wristPos.distanceTo(indexPos) + wristPos.distanceTo(middlePos)) / 2;
+            return avgDist < 0.06; // closed fist - tune this number on device
+        }
+
+        scene.renderer.setAnimationLoop((time, frame) => {
+            const xrSession = scene.renderer.xr.getSession();
+            if (!xrSession) return;
+            const refSpace = scene.renderer.xr.getReferenceSpace();
+
+            for (const source of xrSession.inputSources) {
+                if (!source.hand) continue;
+                const closed = isFist(source.hand, frame, refSpace);
+
+                if (source.handedness === "left") {
+                    if (closed && !leftClosed) grab(leftHand);  //means it's a fist now, but wasn't a fist last frame
+                    if (!closed && leftClosed) release(leftHand);
+                    leftClosed = closed;
+                } else if (source.handedness === "right") {
+                    if (closed && !rightClosed) grab(rightHand);
+                    if (!closed && rightClosed) release(rightHand);
+                    rightClosed = closed;
+                }
+            }
+        });
+
         function grab(handEl) {
             if (grabbed) return;
             
@@ -102,11 +147,6 @@
             grabbed = null;
             logToVR("Released");
         }
-
-        leftHand.addEventListener("pinchstarted", () => grab(leftHand));
-        rightHand.addEventListener("pinchstarted", () => grab(rightHand));
-        leftHand.addEventListener("pinchended", () => release(leftHand));
-        rightHand.addEventListener("pinchended", () => release(rightHand));
 
         scene.addEventListener("enter-vr", () => {
             // Falls versehentlich VR gestartet wird -> sofort wieder verlassen

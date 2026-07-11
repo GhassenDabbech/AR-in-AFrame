@@ -74,47 +74,36 @@
             debugText.setAttribute("text", "value: " + msg);
         }
 
-        // This loop runs every frame
-        scene.renderer.setAnimationLoop(() => {
+        let isGrabbed = false;
+        scene.renderer.setAnimationLoop((time, frame) => {
             const xrSession = scene.renderer.xr.getSession();
             if (!xrSession) {
-                logToVR("Start AR Mode");
+                logToVR("Start AR mode");
                 return;
             }
-
-            // Access raw WebXR input sources
-            const inputSources = xrSession.inputSources;
-            let foundHand = null;
-
-            for (let source of inputSources) {
-                if (source.hand) {
-                    foundHand = source;
-                    break;
-                }
-            }
-
-            if (!foundHand) {
-                logToVR("Move hands in view");
-                return;
-            }
-
-            // Get the wrist position (the most stable part of the hand)
-            const wrist = foundHand.hand.get("wrist");
-            if (wrist) {
-                const handPos = new THREE.Vector3().setFromMatrixPosition(wrist.jointPose.transform.matrix);
-                const objPos = new THREE.Vector3();
-                model.object3D.getWorldPosition(objPos);
-
-                const dist = handPos.distanceTo(objPos);
-                logToVR("Dist: " + dist.toFixed(2));
-
-                if (dist < 0.15) {
-                    logToVR("Grabbed!");
-                    // Attach model to the hand's local coordinate system
-                    foundHand.hand.get("wrist").object3D.add(model.object3D);
+            const refspace = scene.renderer.xr.getReferenceSpace();
+            for (let source of xrSession.inputSources) {
+                if (source.gripSpace) {
+                    const pose = frame.getPose(source.gripSpace, refSpace);
+                    if (!pose) continue;
+                    const handPos = new THREE.Vector3().setFromMatrixPosition(pose.transform.matrix);
+                    const objPos = new THREE.Vector3();
+                    model.object3D.getWorldPosition(objPos);
+                    const dist = handPos.distanceTo(objPos);
+                    if (!isGrabbed) {
+                        logToVR("Dist: " + dist.toFixed(2));
+                        if (dist < 0.2) {
+                            isGrabbed = true;
+                            logToVR("Grabbed!");
+                            scene.object3D.attach(model.object3D);
+                        }
+                    } else {
+                        model.object3D.position.copy(handPos);
+                    }
                 }
             }
         });
+
         scene.addEventListener("enter-vr", () => {
 
             // Falls versehentlich VR gestartet wird -> sofort wieder verlassen

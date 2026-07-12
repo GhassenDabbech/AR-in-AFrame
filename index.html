@@ -21,23 +21,16 @@
         canvas {
             background: transparent !important;
         }
-
-        #qrcode {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 9999;
-        }
     </style>
 </head>
 
 <body>
-    <div id="qrcode" style="margin: 20px;"></div>
-
+    <!----------------------------------------------- SCENE SETUP ----------------------------------------------->
     <a-scene renderer="alpha:true; colorManagement:true;" background="color: transparent" xr-mode-ui="XRMode: ar"
         webxr="requiredFeatures: hand-tracking, local-floor; optionalFeatures: hit-test">
 
         <a-camera position="0 1.6 0">
+            <!-- Console to debug (cause the quest browser doesn't have one) -->
             <a-entity id="debug-text"
                       position="0 -0.3 -0.5" 
                       text="value: Waiting for input...; align: center; color: white;" 
@@ -50,17 +43,20 @@
 
         <a-light type="directional" intensity="1" position="-1 2 1">
         </a-light>
-
+    
+    <!----------------------------------------------- HANDS ----------------------------------------------->
         <a-entity id="leftHand" class="hand" hand-tracking-controls="hand: left">
         </a-entity>
 
         <a-entity id="rightHand" class="hand" hand-tracking-controls="hand: right">
         </a-entity>
-
+    
+    <!----------------------------------------------- MODEL ----------------------------------------------->
         <a-entity id="model" class = "grabbable" position="0 1.5 -1" rotation="0 0 0" scale="0.1 0.1 0.1">
         </a-entity>
     </a-scene>
 
+    <!----------------------------------------------- SETUP ----------------------------------------------->
     <script>
         const scene = document.querySelector("a-scene");
         const debugText = document.getElementById("debug-text");
@@ -71,14 +67,21 @@
         const grabDist = 0.2;
         let grabbed = null;
 
+        //For 2-fists:
+        let twoHandsActive = false;
+        let twoHandsStartDist = 0;
+        let twoHandStartScale = 1;
+
         // Load model
         const modelUrl = decodeURIComponent(location.search.substring(1));
         if (modelUrl) model.setAttribute("gltf-model", modelUrl);
 
+        // send to AR-console to debug
         function logToVR(msg) {
             debugText.setAttribute("text", "value: " + msg);
         }
 
+        //<------------------------------------------- FIST DETECTION ------------------------------------------->
         let leftClosed = false;
         let rightClosed = false;
 
@@ -106,6 +109,16 @@
 
         const FIST_THRESHOLD = 0.13;
 
+        // Useful for 2-fist-scaling
+        function getWristPos(handEl) {
+            const wristObj = handEl.object3D.getObjectByName("wrist");
+            if (!wristObj) return null;
+            const pos = new THREE.Vector3();
+            wristObj.getWorldPosition(pos);
+            return pos;
+        }
+
+        //<----------------------------------- MAIN LOOP (runs every frame) ----------------------------------->
         AFRAME.registerComponent("hand-grabber", {
             tick: function () {
                 const frame = scene.frame;
@@ -133,12 +146,38 @@
                     rightClosed = closed;
                 }
             }
+            // 2-FIST-MODE:
+            if (leftClosed && rightClosed && grabbed) {
+                const leftPos = getWristPos(leftHand);
+                const rightPos = getWristPos(rightHand);
+
+                if (leftPos && rightPos){ // if they're not null
+                    const dist = leftPos.distanceTo(rightPos);
+                    if (!twoHandsActive) {
+                        scene.object3D.attach(model.object3D); // Attach model to scene (after it was attached to 1 hand)
+                        twoHandsStartDist = dist;
+                        twoHandStartScale = model.object3D.scale.x; // Only need 1 axis since they're all equal
+                        twoHandsActive = true;
+                    } else {
+                        const scaleFactor = dist / twoHandsStartDist;
+                        const newScale = twoHandStartScale * scaleFactor;
+                        model.object3D.scale.set(newScale, newScale, newScale);
+                        
+                        // NICE TO HAVE: Make model move while in 2-fist mode:
+                        const midPoint = new THREE.Vector3().addVectors(leftPos, rightPos).multiplyScalar(0.5);
+                        model.object3D.position.copy(midPoint);
+                    }
+                }
+            } else {
+                twoHandsActive = false; // Turn off 2-fist mode after we're done
+            }
+
         }
     });
 
     scene.setAttribute("hand-grabber", "");
 
-
+    // GRAB & RELEASE
     function grab(handEl) {
         if (grabbed) return;
 
@@ -167,6 +206,7 @@
         logToVR("Released");
     }
 
+        //<----------------------------------- AR MODE SAFETY ----------------------------------->
         scene.addEventListener("enter-vr", () => {
             // Falls versehentlich VR gestartet wird -> sofort wieder verlassen
             if (scene.is("vr-mode") && !scene.is("ar-mode")) {
@@ -174,13 +214,6 @@
                 return;
             }
             scene.renderer.setClearColor(0x000000, 0);
-        });
-
-        //QR-Code generieren
-        new QRCode(document.getElementById("qrcode"), {
-            text: window.location.href, //holt die aktuelle URL
-            width: 300,
-            height: 300,
         });
     </script>
 

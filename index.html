@@ -159,13 +159,23 @@
                     if (!twoHandsActive) {
                         // Reparent to scene manually (after it was attached to 1 hand)
                         // previously used attach(), which caused the model to teleport
-                        const worldPos = new THREE.Vector3();
-                        model.object3D.getWorldPosition(worldPos);
+                        const worldPos = new THREE.Vector3();           // Empty vector to hold model's real position
+                        model.object3D.getWorldPosition(worldPos);          // Read it
+
+                        const worldQuat = new THREE.Quaternion();       // Empty vector to hold model's real rotation
+                        model.object3D.getWorldQuaternion(worldQuat);       // Read it
+
+                        const worldScale = new THREE.Vector3();         // Empty vector to hold model's real size
+                        model.object3D.getWorldScale(worldScale);           // Read it
+
                         scene.object3D.add(model.object3D);
-                        model.object3D.position.copy(worldPos);
+
+                        model.object3D.position.copy(worldPos);     // Put position back
+                        model.object3D.quaternion.copy(worldQuat);  // Put rotation back
+                        model.object3D.scale.copy(worldScale);      // Put size back
                         
                         twoHandsStartDist = dist;
-                        twoHandStartScale = model.object3D.scale.x; // Only need 1 axis since they're all equal
+                        twoHandStartScale = worldScale.x; // world scale instead of local scale, & only need 1 axis since they're all equal
                         twoHandsActive = true;
 
                         // needed to fix sudden teleport bug when scaling:

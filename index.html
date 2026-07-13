@@ -211,6 +211,7 @@
                         const angleDelta = currentAngle - twoHandsStartAngle;
                         const deltaQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angleDelta);
                         model.object3D.quaternion.copy(deltaQuat).multiply(twoHandsStartQuat);
+                        logToVR("angle: " + angleDelta.toFixed(2));
                     }
                 }
             } else {

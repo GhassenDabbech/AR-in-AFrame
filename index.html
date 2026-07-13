@@ -157,7 +157,13 @@
                 if (leftPos && rightPos){ // if they're not null
                     const dist = leftPos.distanceTo(rightPos);
                     if (!twoHandsActive) {
-                        scene.object3D.attach(model.object3D); // Attach model to scene (after it was attached to 1 hand)
+                        // Reparent to scene manually (after it was attached to 1 hand)
+                        // previously used attach(), which caused the model to teleport
+                        const worldPos = new THREE.Vector3();
+                        model.object3D.getWorldPosition(worldPos);
+                        scene.object3D.add(model.object3D);
+                        model.object3D.position.copy(worldPos);
+                        
                         twoHandsStartDist = dist;
                         twoHandStartScale = model.object3D.scale.x; // Only need 1 axis since they're all equal
                         twoHandsActive = true;

@@ -75,6 +75,9 @@
         let twoHandsStartMidpoint = new THREE.Vector3();
         let twoHandsStartPos = new THREE.Vector3();
 
+        let twoHandsStartAngle = 0; // For 2-fist-rotation
+        let twoHandsStartQuat = new THREE.Quaternion(); // For 2-fist- rotation
+
         // Load model
         const modelUrl = decodeURIComponent(location.search.substring(1));
         if (modelUrl) model.setAttribute("gltf-model", modelUrl);
@@ -119,6 +122,10 @@
             const pos = new THREE.Vector3();
             wristObj.getWorldPosition(pos);
             return pos;
+        }
+
+        function getHandAngle(leftPos, rightPos){   //Useful for 2-fist-rotation
+            return Math.atan2(rightPos.x - leftPos.x, rightPos.z - leftPos.z);
         }
 
         //<----------------------------------- MAIN LOOP (runs every frame) ----------------------------------->
@@ -174,6 +181,8 @@
                         model.object3D.quaternion.copy(worldQuat);  // Put rotation back
                         model.object3D.scale.copy(worldScale);      // Put size back
                         
+                        twoHandsStartQuat.copy(worldQuat)   // For 2-Fist-Rotation
+
                         twoHandsStartDist = dist;
                         twoHandStartScale = worldScale.x; // world scale instead of local scale, & only need 1 axis since they're all equal
                         twoHandsActive = true;
@@ -182,21 +191,30 @@
                         const startMid = new THREE.Vector3().addVectors(leftPos, rightPos).multiplyScalar(0.5);
                         twoHandsStartMidpoint.copy(startMid);
                         twoHandsStartPos.copy(model.object3D.position);
+
+                        // needed for 2-fist-Rotation
+                        twoHandsStartAngle = getHandAngle(leftPos, rightPos);
                     } else {
                         const scaleFactor = dist / twoHandsStartDist;
                         const newScale = twoHandStartScale * scaleFactor;
                         model.object3D.scale.set(newScale, newScale, newScale);
                         
-                        // NICE TO HAVE: Make model move while in 2-fist mode
+                        // TO DO: Make model move while in 2-fist mode
                         // (+ fix sudden teleport bug when scaling)
                         const midPoint = new THREE.Vector3().addVectors(leftPos, rightPos).multiplyScalar(0.5);
                         const moved = new THREE.Vector3().subVectors(midPoint, twoHandsStartMidpoint);
                         const newPos = new THREE.Vector3().addVectors(twoHandsStartPos, moved);
                         model.object3D.position.copy(newPos);
+
+                        // TO DO: Make model rotate while in 2-fist-mode
+                        const currentAngle = getHandAngle(leftPos, rightPos);
+                        const angleDelta = currentAngle - twoHandsStartAngle;
+                        const deltaQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0, angleDelta));
+                        model.object3D.quaternion.copy(deltaQuat).multiply(twoHandsStartQuat);
                     }
                 }
             } else {
-                twoHandsActive = false; // Turn off 2-fist mode after we're done
+                twoHandsActive = false; // Turn off 2-fist mode
             }
 
         }

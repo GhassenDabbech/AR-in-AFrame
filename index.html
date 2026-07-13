@@ -72,6 +72,9 @@
         let twoHandsStartDist = 0;
         let twoHandStartScale = 1;
 
+        let twoHandsStartMidpoint = new THREE.Vector3();
+        let twoHandsStartPos = new THREE.Vector3();
+
         // Load model
         const modelUrl = decodeURIComponent(location.search.substring(1));
         if (modelUrl) model.setAttribute("gltf-model", modelUrl);
@@ -158,14 +161,22 @@
                         twoHandsStartDist = dist;
                         twoHandStartScale = model.object3D.scale.x; // Only need 1 axis since they're all equal
                         twoHandsActive = true;
+
+                        // needed to fix sudden teleport bug when scaling:
+                        const startMid = new THREE.Vector3().addVectors(leftPos, rightPos).multiplyScalar(0.5);
+                        twoHandsStartMidpoint.copy(startMid);
+                        twoHandsStartPos.copy(model.object3D.position);
                     } else {
                         const scaleFactor = dist / twoHandsStartDist;
                         const newScale = twoHandStartScale * scaleFactor;
                         model.object3D.scale.set(newScale, newScale, newScale);
                         
-                        // NICE TO HAVE: Make model move while in 2-fist mode:
+                        // NICE TO HAVE: Make model move while in 2-fist mode
+                        // (+ fix sudden teleport bug when scaling)
                         const midPoint = new THREE.Vector3().addVectors(leftPos, rightPos).multiplyScalar(0.5);
-                        model.object3D.position.copy(midPoint);
+                        const moved = new THREE.Vector3().subVectors(midPoint, twoHandsStartMidpoint);
+                        const newPos = new THREE.Vector3().addVectors(twoHandsStartPos, moved);
+                        model.object3D.position.copy(newPos);
                     }
                 }
             } else {

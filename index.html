@@ -209,7 +209,7 @@
                         // TO DO: Make model rotate while in 2-fist-mode
                         const currentAngle = getHandAngle(leftPos, rightPos);
                         const angleDelta = currentAngle - twoHandsStartAngle;
-                        const deltaQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0, angleDelta));
+                        const deltaQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angleDelta);
                         model.object3D.quaternion.copy(deltaQuat).multiply(twoHandsStartQuat);
                     }
                 }

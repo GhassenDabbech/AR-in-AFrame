@@ -126,7 +126,7 @@
             const mtcPos = jointPos(middleMtc, frame, refSpace);
             if (!wristPos || !mtcPos) return null;
 
-            return wristPos.distanceTo(metaPos);
+            return wristPos.distanceTo(mtcPos);
         }
 
         function getFistRatio(hand, frame, refSpace) {
@@ -166,7 +166,7 @@
                 if (ratio === null) continue;
 
                 const closed = ratio < FIST_THRESHOLD;
-                logToVR(source.handedness + " fist:" + closed + " (" + dist.toFixed(3) + ")");
+                logToVR(source.handedness + " ratio:" + ratio.toFixed(2));
 
                 if (source.handedness === "left") {
                     if (closed && !leftClosed) grab(leftHand); //means hand is a fist now, but wasn't before

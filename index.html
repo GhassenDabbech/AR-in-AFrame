@@ -75,7 +75,7 @@
         let twoHandsStartMidpoint = new THREE.Vector3();
         let twoHandsStartPos = new THREE.Vector3();
 
-        let twoHandsStartAngle = 0; // For 2-fist-rotation
+        let twoHandsStartDir = new THREE.Vector3(); // For 2-fist-rotation
         let twoHandsStartQuat = new THREE.Quaternion(); // For 2-fist- rotation
 
         // Load model
@@ -124,8 +124,8 @@
             return pos;
         }
 
-        function getHandAngle(leftPos, rightPos){   //Useful for 2-fist-rotation
-            return Math.atan2(rightPos.x - leftPos.x, rightPos.z - leftPos.z);
+        function getHandDir(leftPos, rightPos){   //Useful for 2-fist-rotation
+            return new THREE.Vector3().subVectors(rightPos, leftPos).normalize();
         }
 
         //<----------------------------------- MAIN LOOP (runs every frame) ----------------------------------->
@@ -193,7 +193,7 @@
                         twoHandsStartPos.copy(model.object3D.position);
 
                         // needed for 2-fist-Rotation
-                        twoHandsStartAngle = getHandAngle(leftPos, rightPos);
+                        twoHandsStartDir.copy(getHandDir(leftPos, rightPos));
                     } else {
                         const scaleFactor = dist / twoHandsStartDist;
                         const newScale = twoHandStartScale * scaleFactor;
@@ -207,11 +207,9 @@
                         model.object3D.position.copy(newPos);
 
                         // TO DO: Make model rotate while in 2-fist-mode
-                        const currentAngle = getHandAngle(leftPos, rightPos);
-                        const angleDelta = currentAngle - twoHandsStartAngle;
-                        const deltaQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angleDelta);
+                        const currentDir = getHandDir(leftPos, rightPos);
+                        const deltaQuat = new THREE.Quaternion().setFromUnitVectors(twoHandsStartDir, currentDir);
                         model.object3D.quaternion.copy(deltaQuat).multiply(twoHandsStartQuat);
-                        logToVR("angle: " + angleDelta.toFixed(2));
                     }
                 }
             } else {

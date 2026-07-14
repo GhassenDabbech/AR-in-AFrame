@@ -115,6 +115,28 @@
 
         const FIST_THRESHOLD = 0.09;
 
+        //I tested hand tracking with my own hand dimensions
+        //TO DO: Make it work for all hand sizes (!!Wichtig für workshop!!)
+        function getHandSize(hand, frame, refSpace) {
+            const wrist = hand.get("wrist");
+            const middleMtc = hand.get("middle-finger-metacarpal");
+            if (!wrist || !middleMtc) return null;
+            
+            const wristPos = jointPos(wrist, frame, refSpace);
+            const mtcPos = jointPos(middleMtc, frame, refSpace);
+            if (!wristPos || !mtcPos) return null;
+
+            return wristPos.distanceTo(metaPos);
+        }
+
+        function getFistRatio(hand, frame, refSpace) {
+            const curl = fistDistance(hand, frame, refSpace);
+            const size = getHandSize(hand, frame, refSpace);
+            if (curl === null || size === null) return null;
+
+            return curl / size;
+        }
+
         // Useful for 2-fist-scaling
         function getWristPos(handEl) {
             const wristObj = handEl.object3D.getObjectByName("wrist");
@@ -140,10 +162,10 @@
 
             for (const source of xrSession.inputSources) {
                 if (!source.hand) continue;
-                const dist = fistDistance(source.hand, frame, refSpace);
-                if (dist === null) continue;
+                const ratio = getFistRatio(source.hand, frame, refSpace);
+                if (ratio === null) continue;
 
-                const closed = dist < FIST_THRESHOLD;
+                const closed = ratio < FIST_THRESHOLD;
                 logToVR(source.handedness + " fist:" + closed + " (" + dist.toFixed(3) + ")");
 
                 if (source.handedness === "left") {

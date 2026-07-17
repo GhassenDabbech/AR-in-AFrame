@@ -32,7 +32,7 @@
         <a-camera position="0 1.6 0">
             <!-- Console to debug (cause the quest browser doesn't have one) -->
             <a-entity id="debug-text"
-                      visible = "false"
+                      visible = "true"
                       position="0 -0.3 -0.5" 
                       text="value: Waiting for input...; align: center; color: white;" 
                       geometry="primitive: plane; width: 0.5; height: 0.1"
@@ -92,7 +92,7 @@
 
         // send to AR-console to debug
         function logToVR(msg) {
-            return; // Delete this to turn on console
+            //return; // Delete this to turn on console
             debugText.setAttribute("text", "value: " + msg);
         }
 
@@ -280,6 +280,7 @@
         model.object3D.position.copy(ogPos);
         model.object3D.quaternion.copy(ogRot);
         model.object3D.scale.copy(ogScale);
+        logToVR("reset pos: " + model.object3D.position.x.toFixed(2) + " " + model.object3D.position.y.toFixed(2) + " " + model.object3D.position.z.toFixed(2));
 
         grabbed = null;
         twoHandsActive = false;

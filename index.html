@@ -79,16 +79,17 @@
         let twoHandsStartDir = new THREE.Vector3(); // For 2-fist-rotation
         let twoHandsStartQuat = new THREE.Quaternion(); // For 2-fist- rotation
 
-        // Remember original transforms (for reset)
-        const ogPos = new THREE.Vector3().copy(model.object3D.position);
-        const ogRot = new THREE.Quaternion().copy(model.object3D.quaternion);
-        const ogScale = new THREE.Vector3().copy(model.object3D.scale)
+        
 
         let crossTimer = 0 // For reset
 
         // Load model
         const modelUrl = decodeURIComponent(location.search.substring(1));
         if (modelUrl) model.setAttribute("gltf-model", modelUrl);
+        // Remember original transforms (for reset)
+        const ogPos = new THREE.Vector3().copy(model.object3D.position);
+        const ogRot = new THREE.Quaternion().copy(model.object3D.quaternion);
+        const ogScale = new THREE.Vector3().copy(model.object3D.scale)
 
         // send to AR-console to debug
         function logToVR(msg) {

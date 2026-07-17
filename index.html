@@ -93,6 +93,14 @@
             ogScale.copy(model.object3D.scale);
         });
 
+        // For idle animation:
+        let idleActive = false;
+        let idleAnchor = new THREE.Vector3();
+        let idleTime = 0;
+
+        const IDLE_RADIUS = 0.03;
+        const IDLE_SPEED = 0.5;
+
         // Load model
         const modelUrl = decodeURIComponent(location.search.substring(1));
         if (modelUrl) model.setAttribute("gltf-model", modelUrl);
@@ -276,6 +284,24 @@
                     }
                 } else {
                     crossTimer = 0;
+                }
+
+                //IDLE ANIMATION
+                if (!grabbed && !twoHandsActive) {
+                    if (!idleActive){
+                        idleAnchor.copy(model.object3D.position);
+                        idleTime = 0;
+                        idleActive = true;
+                    }
+                    idleTime += delta / 1000;
+
+                    const offsetX = Math.sin(idleTime * IDLE_SPEED) * IDLE_RADIUS;
+                    const offsetZ = Math.cos(idleTime * IDLE_SPEED) * IDLE_RADIUS;
+                    model.object3D.position.set(idleAnchor.x + offsetX, idleAnchor.y, idleAnchor.z + offsetZ);
+
+                    model.object3D.rotation.y += IDLE_SPEED * (delta / 1000);
+                } else {
+                    idleActive = false;
                 }
             }
         });

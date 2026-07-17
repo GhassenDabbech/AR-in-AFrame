@@ -166,12 +166,12 @@
             return new THREE.Vector3().subVectors(rightPos, leftPos).normalize();
         }
 
-        function isCrossed(leftPos, rightPos, leftIsFist, rightIsFist) { // Last 2 params are local (don't need to appear outside function)
+        function isCrossed(leftPos, rightPos, leftIsFist, rightIsFist) { // Last 2 params are local
             if (leftIsFist || rightIsFist) return false;
 
             const swapped = leftPos.x > rightPos.x
-            const closeHorizontally = Math.abs(leftPos.x - rightPos.x) < 0.15;
-            const sameHeight = Math.abs(leftPos.y - rightPos.y) < 0.15;
+            const closeHorizontally = Math.abs(leftPos.x - rightPos.x) < 0.3;
+            const sameHeight = Math.abs(leftPos.y - rightPos.y) < 0.3;
 
             return swapped && closeHorizontally && sameHeight
         }
@@ -270,7 +270,7 @@
 
                 if (leftWristPos && rightWristPos && isCrossed(leftWristPos, rightWristPos, leftClosed, rightClosed)){
                     crossTimer += delta / 1000;
-                    if (crossTimer >= 2) {
+                    if (crossTimer >= 1) {
                         resetModel();
                         crossTimer = 0;
                     }

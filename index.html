@@ -185,7 +185,7 @@
                     if (ratio === null) continue;
 
                     const closed = ratio < FIST_THRESHOLD;
-                    logToVR(source.handedness + " ratio:" + ratio.toFixed(2));
+                    //logToVR(source.handedness + " ratio:" + ratio.toFixed(2));
 
                     if (source.handedness === "left") {
                         if (closed && !leftClosed) grab(leftHand); //means hand is a fist now, but wasn't before

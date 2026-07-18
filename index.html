@@ -97,8 +97,8 @@
         let idleActive = false;
         let idleAnchor = new THREE.Vector3();
         let idleTime = 0;
+        let idleWaitTime = 0;
 
-        const IDLE_RADIUS = 0.03;
         const IDLE_SPEED = 0.5;
 
         // Load model
@@ -288,67 +288,69 @@
 
                 //IDLE ANIMATION
                 if (!grabbed && !twoHandsActive) {
-                    if (!idleActive){
-                        idleAnchor.copy(model.object3D.position);
-                        idleTime = 0;
-                        idleActive = true;
-                    }
-                    idleTime += delta / 1000;
+                    idleWaitTime += delta / 1000;
 
-                    const offsetX = Math.sin(idleTime * 0.5) * 0.02 + Math.sin(idleTime * 1.3) * 0.015;
-                    const offsetY = Math.sin(idleTime * 0.7) * 0.01;
-                    const offsetZ = Math.cos(idleTime * 0.4) * 0.02 + Math.cos(idleTime * 0.9) * 0.015;
-                    model.object3D.position.set(idleAnchor.x + offsetX, idleAnchor.y + offsetY, idleAnchor.z + offsetZ);
+                    if (idleWaitTime >= 10){
+                            if (!idleActive) {
+                            idleAnchor.copy(model.object3D.position);
+                            idleTime = 0;
+                            idleActive = true;
+                        }
+                        idleTime += delta / 1000;
 
-                    model.object3D.rotation.y += (IDLE_SPEED * 0.6 + Math.sin(idleTime * 0.3) * IDLE_SPEED * 0.4) * (delta / 1000);
+                        const offsetY = Math.sin(idleTime * 0.5) * 0.02;
+                        model.object3D.position.set(idleAnchor.x, idleAnchor.y + offsetY, idleAnchor.z);
+                        model.object3D.rotation.y += IDLE_SPEED * (delta / 1000);
+                    } 
                 } else {
+                    idleWaitTime = 0;
                     idleActive = false;
                 }
             }
         });
 
-    scene.setAttribute("hand-grabber", "");
+        scene.setAttribute("hand-grabber", "");
 
-    function resetModel(){
-        scene.object3D.add(model.object3D); // Auto-detach from hand
-        model.object3D.position.copy(ogPos);
-        model.object3D.quaternion.copy(ogRot);
-        model.object3D.scale.copy(ogScale);
-        logToVR("reset pos: " + model.object3D.position.x.toFixed(2) + " " + model.object3D.position.y.toFixed(2) + " " + model.object3D.position.z.toFixed(2));
+        function resetModel(){
+            scene.object3D.add(model.object3D); // Auto-detach from hand
+            model.object3D.position.copy(ogPos);
+            model.object3D.quaternion.copy(ogRot);
+            model.object3D.scale.copy(ogScale);
+            //logToVR("reset pos: " + model.object3D.position.x.toFixed(2) + " " + model.object3D.position.y.toFixed(2) + " " + model.object3D.position.z.toFixed(2));
 
-        grabbed = null;
-        twoHandsActive = false;
-        //logToVR("Reset");
-    }
-
-    // GRAB & RELEASE
-    function grab(handEl) {
-        if (grabbed) return;
-
-        const wristObj = handEl.object3D.getObjectByName("wrist");
-        if (!wristObj) return;
-
-        const handPos = new THREE.Vector3();
-        wristObj.getWorldPosition(handPos);
-
-        const modelPos = new THREE.Vector3();
-        model.object3D.getWorldPosition(modelPos);
-
-        const dist = handPos.distanceTo(modelPos);
-        if (dist < grabDist) {
-            grabbed = wristObj;
-            wristObj.attach(model.object3D);
-            logToVR("Grabbed!");
+            grabbed = null;
+            twoHandsActive = false;
+            //logToVR("Reset");
         }
-    }
 
-    function release(handEl) {
-        const wristObj = handEl.object3D.getObjectByName("wrist");
-        if (grabbed !== wristObj) return;
-        scene.object3D.attach(model.object3D);
-        grabbed = null;
-        logToVR("Released");
-    }
+        // GRAB & RELEASE
+        function grab(handEl) {
+            if (grabbed) return;
+
+            const wristObj = handEl.object3D.getObjectByName("wrist");
+            if (!wristObj) return;
+
+            const handPos = new THREE.Vector3();
+            wristObj.getWorldPosition(handPos);
+
+            const modelPos = new THREE.Vector3();
+            model.object3D.getWorldPosition(modelPos);
+
+            const dist = handPos.distanceTo(modelPos);
+            if (dist < grabDist) {
+                grabbed = wristObj;
+                wristObj.attach(model.object3D);
+                logToVR("Grabbed!");
+            }
+        }
+
+        function release(handEl) {
+            const wristObj = handEl.object3D.getObjectByName("wrist");
+            if (grabbed !== wristObj) return;
+            scene.object3D.attach(model.object3D);
+            grabbed = null;
+            logToVR("Released");
+        }
 
         //<----------------------------------- AR MODE SAFETY ----------------------------------->
         scene.addEventListener("enter-vr", () => {

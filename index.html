@@ -114,6 +114,13 @@
         }
 
         async function getHeadsetCameraStream() {
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: true});
+            } catch (err){
+                logToVR("permission denied" + err.message);
+                return null;
+            }
+
             const devices = await navigator.mediaDevices.enumerateDevices();
             const headsetCam = devices.find(d => d.kind === "videoinput" && d.label.toLowerCase().includes("headset"));
 

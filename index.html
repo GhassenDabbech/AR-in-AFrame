@@ -101,6 +101,8 @@
 
         const IDLE_SPEED = 0.5;
 
+        let scanTriggerTimer = 0;
+
         // Load model
         const modelUrl = decodeURIComponent(location.search.substring(1));
         if (modelUrl) model.setAttribute("gltf-model", modelUrl);
@@ -110,6 +112,27 @@
             //return; // Delete this to turn on console
             debugText.setAttribute("text", "value: " + msg);
         }
+
+        async function getHeadsetCameraStream() {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const headsetCam = devices.find(d => d.kind === "videoinput" && d.label.toLowerCase().includes("headset"));
+
+            if (!headsetCam) {
+                logToVR("no headset camera found");
+                return null;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { deviceId: { exact: headsetCam.deviceId}}
+                });
+                logToVR("camrea stream ok");
+                return stream;
+            } catch (err) {
+                logToVR("camera failed: " + err.message);
+                return null;
+            }
+        } 
 
         //<------------------------------------------- FIST DETECTION ------------------------------------------->
         let leftClosed = false;
@@ -305,6 +328,17 @@
                 } else {
                     idleWaitTime = 0;
                     idleActive = false;
+                }
+
+                // Cam scan test:
+                if (!leftClosed && !rightClosed) {
+                    scanTriggerTimer += delta / 1000;
+                    if (scanTriggerTimer >=1){
+                        getHeadsetCameraStream();
+                        scanTriggerTimer = 0;
+                    }
+                } else {
+                    scanTriggerTimer = 0;
                 }
             }
         });

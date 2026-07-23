@@ -6,7 +6,7 @@
 
     <!-- Neuere A-Frame Version -->
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
     <style>
         html,
@@ -57,6 +57,12 @@
         </a-entity>
     </a-scene>
 
+    <!-- QR Scanner to add new objects -->
+    <div id="scanner-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black;z-index:999;">
+        <video id="qr-video" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
+    </div>
+    <canvas id="qr-canvas" style="display:none;"></canvas>
+
     <!----------------------------------------------- SETUP ----------------------------------------------->
     <script>
         const scene = document.querySelector("a-scene");
@@ -85,6 +91,8 @@
         const ogScale = new THREE.Vector3();
 
         let crossTimer = 0 // For reset
+
+        let thumbsUpTimer = 0;
     
         model.addEventListener("loaded", () => {
             // Fill placeholders once model loads
@@ -178,6 +186,27 @@
 
             return wristPos.distanceTo(mtcPos);
         }
+
+        function isThumbsUp(hand, frame, refSpace){
+            const wrist = hand.get("wrist");
+            const thumbTip = hand.get("thumb-tip");
+            if (!wrist || !thumbTip) return false;
+
+            const wristPos = jointPos(wrist, frame, refSpace);
+            const thumbPos = jointPos(thumbTip, frame, refSpace);
+            if (!wristPos || !thumbPos) return false;
+
+            const size = getHandSize(hand, frame, refSpace);
+            const curl = fistDistance(hand, frame, refSpace);
+            if (!size || curl === null) return false;
+
+            const thumbRatio = wristPos.distanceTo(thumbPos) / size;
+            const curlRatio = curl / size;
+
+            return thumbRatio > THUMB_THRESHOLD && curlRatio < FIST_THRESHOLD;
+        }
+
+        const THUMB_THRESHOLD = 1.4;
 
         function getFistRatio(hand, frame, refSpace) {
             const curl = fistDistance(hand, frame, refSpace);
@@ -343,6 +372,21 @@
                 } else {
                     scanTriggerTimer = 0;
                 }*/
+
+                let anyThumbsUp = false;
+                for (const source of xrSession.inputSources) {
+                    if (!source.hand) continue;
+                    if (isThumbsUp(source.hand, frame, refSpace)) anyThumbsUp = true;
+                }
+                if (anyThumbsUp) {
+                    thumbsUpTimer += delta / 1000;
+                    if (thumbsUpTimer >= 1) {
+                        logToVR("THUMBS UP");
+                        thumbsUpTimer = 0;
+                    }
+                } else {
+                    thumbsUpTimer = 0;
+                }
             }
         });
 

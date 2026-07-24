@@ -202,6 +202,8 @@
 
             const curlRatio = curl / size;
             const thumbSeparation = thumbPos.distanceTo(indexPos) / size;
+            logToVR("sep:" + thumbSeparation.toFixed(2) + " curl:" + curlRatio.toFixed(2));
+
 
             return curlRatio < FIST_THRESHOLD && thumbSeparation > THUMB_THRESHOLD
         }

@@ -137,13 +137,16 @@
 
                 overlay.style.display = "block";
                 
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment"} });
-                    video.srcObject = stream;
-                    logToVR("cam live");
-                } catch (err) {
-                    logToVR("cam fail: " + err.message);
-                }
+                setTimeout(async () => {
+                    logToVR("requesting cam");
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment"} });
+                        video.srcObject = stream;
+                        logToVR("cam live");
+                    } catch (err) {
+                        logToVR("cam fail: " + err.message);
+                    }
+                }, 500);
             }, {once: true});
 
             await xrSession.end();

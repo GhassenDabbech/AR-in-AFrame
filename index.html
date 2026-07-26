@@ -130,6 +130,8 @@
 
             logToVR('ending session');
             xrSession.addEventListener("end", async () => {
+                logToVR("session ended");
+
                 const overlay = document.getElementById("scanner-overlay");
                 const video = document.getElementById("qr-video");
 
@@ -386,7 +388,6 @@
                     thumbsUpTimer += delta / 1000;
                     if (thumbsUpTimer >= 1) {
                         exitARforScan();
-                        logToVR("THUMBS UP");
                         thumbsUpTimer = 0;
                     }
                 } else {

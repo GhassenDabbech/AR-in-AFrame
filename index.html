@@ -94,6 +94,7 @@
         let crossTimer = 0 // For reset
 
         let thumbsUpTimer = 0;
+        let awaitingScanResult = false;
     
         model.addEventListener("loaded", () => {
             // Fill placeholders once model loads
@@ -125,6 +126,7 @@
         }
 
         async function exitARforScan() {
+            awaitingScanResult = true;
             const xrSession = scene.renderer.xr.getSession();
             if (!xrSession) return;
 
@@ -450,6 +452,18 @@
                 return;
             }
             scene.renderer.setClearColor(0x000000, 0);
+        });
+
+        document.addEventListener("visibilitychange", async () => {
+            if (document.visibilityState === "visible" && awaitingScanResult) {
+                awaitingScanResult = false;
+                try {
+                    const text = await navigator.clipboard.readText();
+                    logToVR("clipboard OK: " + text);
+                } catch (err) {
+                    logToVR("clipboard fail: " + err.message);
+                }
+            }
         });
     </script>
 

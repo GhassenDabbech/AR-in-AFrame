@@ -256,6 +256,8 @@
                 const frame = scene.frame;
                 if (!frame) return;
 
+                logToVR("L:" + leftHand.object3D.visible + " R:" + rightHand.object3D.visible);
+
                 const xrSession = scene.renderer.xr.getSession();
                 if (!xrSession) return;
                 const refSpace = scene.renderer.xr.getReferenceSpace();

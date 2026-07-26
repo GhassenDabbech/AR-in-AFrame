@@ -140,7 +140,7 @@
                 setTimeout(async () => {
                     logToVR("requesting cam");
                     try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment"} });
+                        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                         video.srcObject = stream;
                         logToVR("cam live");
                     } catch (err) {

@@ -126,7 +126,6 @@
         }
 
         async function exitARforScan() {
-            awaitingScanResult = true;
             const xrSession = scene.renderer.xr.getSession();
             if (!xrSession) return;
 
@@ -140,13 +139,14 @@
                 overlay.style.display = "block";
                 
                 setTimeout(async () => {
-                    logToVR("requesting cam");
+                    awaitingScanResult = true;
+                    logToVR("awaiting scan result");
                     try {
                         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                         video.srcObject = stream;
                         logToVR("cam live");
                     } catch (err) {
-                        logToVR("cam fail: " + err.message);
+                        //logToVR("cam fail: " + err.message);
                     }
                 }, 2000);
             }, {once: true});

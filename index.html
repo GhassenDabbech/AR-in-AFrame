@@ -121,27 +121,26 @@
             debugText.setAttribute("text", "value: " + msg);
         }
 
-        async function testExitAndScan() {
+        async function exitARforScan() {
             const xrSession = scene.renderer.xr.getSession();
             if (!xrSession) return;
 
             logToVR('ending session');
             xrSession.addEventListener("end", async () => {
-                logToVR("session ended, testing cam");
+                const overlay = document.getElementById("scanner-overlay");
+                const video = document.getElementById("qr-video");
 
+                overlay.style.display = "block";
+                
                 try {
-                    const stream = await navigator.mediaDevices.getUserMedia({video : true});
-                    logToVR("cam works outside ar");
-                    stream.getTracks().forEach(t => t.stop()); //TODO: change later
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment"} });
+                    video.srcObject = stream;
+                    logToVR("cam live");
                 } catch (err) {
-                    logToVR("cam failed" + err.message);
+                    logToVR("cam fail: " + err.message);
                 }
+            }, {once: true});
 
-                setTimeout(() => {
-                    logToVR("re-entering AR");
-                    scene.enterVR();
-                }, 1000);
-            });
             await xrSession.end();
         }
 
@@ -383,6 +382,7 @@
                 if (anyThumbsUp) {
                     thumbsUpTimer += delta / 1000;
                     if (thumbsUpTimer >= 1) {
+                        exitARforScan();
                         logToVR("THUMBS UP");
                         thumbsUpTimer = 0;
                     }

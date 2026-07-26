@@ -252,15 +252,24 @@
 
         //<----------------------------------- MAIN LOOP (runs every frame) ----------------------------------->
         AFRAME.registerComponent("hand-grabber", {
-            tick: function (time, delta) { // delta = time since last frame.    time and delta are only used for reset
+            tick: async function (time, delta) { // delta = time since last frame.    time and delta are only used for reset
                 const frame = scene.frame;
                 if (!frame) return;
-
-                logToVR("L:" + leftHand.object3D.visible + " R:" + rightHand.object3D.visible);
 
                 const xrSession = scene.renderer.xr.getSession();
                 if (!xrSession) return;
                 const refSpace = scene.renderer.xr.getReferenceSpace();
+
+                if (awaitingScanResult && (leftHand.object3D.visible || rightHand.object3D.visible)) {
+                    awaitingScanResult = false;
+                    try {
+                        const text = await navigator.clipboard.readText();
+                        logToVR("clipboard OK: " + text);
+                    } catch (err) {
+                        logToVR("clipboard fail: " + err.message);
+                    }
+                }
+            
 
                 for (const source of xrSession.inputSources) {
                     if (!source.hand) continue;
@@ -455,18 +464,7 @@
             }
             scene.renderer.setClearColor(0x000000, 0);
         });
-
-        document.addEventListener("visibilitychange", async () => {
-            if (document.visibilityState === "visible" && awaitingScanResult) {
-                awaitingScanResult = false;
-                try {
-                    const text = await navigator.clipboard.readText();
-                    logToVR("clipboard OK: " + text);
-                } catch (err) {
-                    logToVR("clipboard fail: " + err.message);
-                }
-            }
-        });
+        
     </script>
 
 </body>

@@ -146,7 +146,7 @@
                     } catch (err) {
                         logToVR("cam fail: " + err.message);
                     }
-                }, 500);
+                }, 2000;
             }, {once: true});
 
             await xrSession.end();

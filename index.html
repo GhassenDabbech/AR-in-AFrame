@@ -263,10 +263,11 @@
                 if (awaitingScanResult && (leftHand.object3D.visible || rightHand.object3D.visible)) {
                     awaitingScanResult = false;
                     try {
-                        const text = await navigator.clipboard.readText();
-                        logToVR("clipboard OK: " + text);
+                        const response = await fetch("https://api.github.com/zen");
+                        const text = await response.text();
+                        logToVR("fetch OK: " + text);
                     } catch (err) {
-                        logToVR("clipboard fail: " + err.message);
+                        logToVR("fetch fail: " + err.message);
                     }
                 }
             

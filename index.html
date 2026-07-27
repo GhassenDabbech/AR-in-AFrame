@@ -404,7 +404,8 @@
                 if (anyThumbsUp) {
                     thumbsUpTimer += delta / 1000;
                     if (thumbsUpTimer >= 1) {
-                        exitARforScan();
+                        logToVR("launching QR²AR");
+                        window.location.href = "intent://scan#Intent;scheme=qr2ar;package=com.sketch2life.qr2ar;end";
                         thumbsUpTimer = 0;
                     }
                 } else {

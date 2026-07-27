@@ -63,6 +63,7 @@
     </div>
     <canvas id="qr-canvas" style="display:none;"></canvas>
     <div id="debug-html" style="position:fixed; top:10px; left:10px; z-index:1001; background:rgba(0,0,0,0.7); color:white; padding:10px; font-family:monospace; font-size:14px; max-width:90%"></div>
+    <a id="scan-link" href="qr2ar://scan" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1002; font-size:24px; background:white; color:black; padding:20px 40px; text-decoration:none; border-radius:10px;">Tap to Scan</a>
 
     <!----------------------------------------------- SETUP ----------------------------------------------->
     <script>
@@ -404,8 +405,9 @@
                 if (anyThumbsUp) {
                     thumbsUpTimer += delta / 1000;
                     if (thumbsUpTimer >= 1) {
-                        logToVR("launching QR²AR");
-                        window.location.href = "qr2ar://scan";
+                        logToVR("show scan button");
+                        document.getElementById("scan-link").style.display = "block";
+                        //window.location.href = "qr2ar://scan";
                         thumbsUpTimer = 0;
                     }
                 } else {

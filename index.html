@@ -64,7 +64,9 @@
     <div style="font-size:32px; margin-bottom:8px;">📷</div>
     <div style="font-size:22px; font-weight:bold;">Tap to Scan New Object</div>
     <div style="font-size:14px; color:#666; margin-top:6px;">Opens the QR scanner</div>
-</a>
+    </a>
+
+    <a id="shared-view-link" href="" style="position:fixed; bottom:20px; left:20px; z-index:1002; font-size:18px; background:white; color:black; padding:15px 25px; text-decoration:none; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.3); font-family:sans-serif;">Shared View</a>
     <!----------------------------------------------- SETUP ----------------------------------------------->
     <script>
         const scene = document.querySelector("a-scene");
@@ -432,6 +434,13 @@
         });
 
         scene.setAttribute("hand-grabber", "");
+        document.getElementById("shared-view-link").addEventListener("click", (e) => {
+            e.preventDefault();
+            const sharedViewBase = "https://ar-gemeinsam.onrender.com/";
+            const sharedViewRoom = prompt("Enter room name:") || "test";
+            const finalUrl = sharedViewBase + "?room=" + encodeURIComponent(sharedViewRoom) + "&model=" + encodeURIComponent(modelUrl);
+            window.open(finalUrl, "_blank");
+        });
 
         function resetModel(){
             scene.object3D.add(model.object3D); // Auto-detach from hand
@@ -451,7 +460,7 @@
             entity.setAttribute("position", "0 1.5 -1");
             entity.setAttribute("scale", "0.1 0.1 0.1");
             scene.appendChild(entity);
-            objects.push(entity);
+            objects.push(entity); //Adds new object to objects list
         }
 
         // GRAB & RELEASE

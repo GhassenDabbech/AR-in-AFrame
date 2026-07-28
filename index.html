@@ -114,6 +114,8 @@
 
         let scanTriggerTimer = 0;
 
+        let selectListenerAdded = false;
+
         // Load model
         const modelUrl = decodeURIComponent(location.search.substring(1));
         if (modelUrl) model.setAttribute("gltf-model", modelUrl);
@@ -412,6 +414,13 @@
                     }
                 } else {
                     thumbsUpTimer = 0;
+                }
+                if (xrSession && !selectListenerAdded) {
+                    selectListenerAdded = true;
+                    xrSession.addEventListener("select", () => {
+                        logToVR("select ok, opening app");
+                        window.location.href = "qr2ar://scan";
+                    });
                 }
             }
         });

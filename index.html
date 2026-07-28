@@ -433,6 +433,15 @@
 
         scene.setAttribute("hand-grabber", "");
 
+        document.getElementById("scan-link").addEventListener("click", () =>{
+            const link = document.getElementById("scan-link");
+            setTimeout(() => {
+                link.textContent = "Tap to re-enter AR";
+                link.removeAttribute("href");
+                link.addEventListener("click", () => scene.enterVR(), { once: true});
+            }, 1500);
+        });
+
         function resetModel(){
             scene.object3D.add(model.object3D); // Auto-detach from hand
             model.object3D.position.copy(ogPos);

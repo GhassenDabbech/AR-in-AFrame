@@ -76,7 +76,8 @@
         const rightHand = document.getElementById("rightHand");
 
         const grabDist = 0.2;
-        let grabbed = null;
+        let leftGrabbed = null;
+        let rightGrabbed = null;
 
         //For 2-fists:
         let twoHandsActive = false;
@@ -104,6 +105,14 @@
             ogPos.copy(model.object3D.position);
             ogRot.copy(model.object3D.quaternion);
             ogScale.copy(model.object3D.scale);
+
+            objects[0] = {
+                el: model,
+                ogPos: ogPos.clone(),
+                ogRot: ogRot.clone(),
+                ogScale: ogScale.clone(),
+                grabbedBy: null
+            };
         });
 
         // For idle animation:
@@ -117,7 +126,7 @@
         let scanTriggerTimer = 0;
 
         let selectListenerAdded = false;
-        let objects = [model];
+        let objects = [];
         let lastKnownScanUrl = "";
 
         // Load model
@@ -257,6 +266,22 @@
             return swapped && closeHorizontally && sameHeight
         }
 
+        function getNearest(objects, pos, maxDist){
+            let target = null;
+            let nearestDist = maxDist;
+
+            for (const obj of objects) {
+                const objPos = new THREE.Vector3();
+                obj.el.object3D.getWorldPosition(objPos);
+                const dist = pos.distanceTo(objPos);
+                if (dist < nearestDist) {
+                    target = obj;
+                    nearestDist = dist;
+                }
+            }
+            return target;
+        }
+
         //<----------------------------------- MAIN LOOP (runs every frame) ----------------------------------->
         AFRAME.registerComponent("hand-grabber", {
             tick: async function (time, delta) { // delta = time since last frame.    time and delta are only used for reset
@@ -300,7 +325,7 @@
                     }
                 }
                 // 2-FIST-MODE:
-                if (leftClosed && rightClosed && grabbed) {
+                if (leftClosed && rightClosed && (leftGrabbed || rightGrabbed)) {
                     const leftPos = getWristPos(leftHand);
                     const rightPos = getWristPos(rightHand);
 
@@ -374,7 +399,7 @@
                 }
 
                 //IDLE ANIMATION
-                if (!grabbed && !twoHandsActive) {
+                if (!leftGrabbed && !rightGrabbed && !twoHandsActive) {
                     idleWaitTime += delta / 1000;
 
                     if (idleWaitTime >= 10){
@@ -431,6 +456,7 @@
                     });
                 }
             }
+        // TO DO: ADD INTERACTION FOR NEW OBJECTS
         });
 
         scene.setAttribute("hand-grabber", "");
@@ -449,7 +475,8 @@
             model.object3D.scale.copy(ogScale);
             //logToVR("reset pos: " + model.object3D.position.x.toFixed(2) + " " + model.object3D.position.y.toFixed(2) + " " + model.object3D.position.z.toFixed(2));
 
-            grabbed = null;
+            leftGrabbed = null;
+            rightGrabbed = null;
             twoHandsActive = false;
             //logToVR("Reset");
         }
@@ -460,12 +487,28 @@
             entity.setAttribute("position", "0 1.5 -1");
             entity.setAttribute("scale", "0.1 0.1 0.1");
             scene.appendChild(entity);
-            objects.push(entity); //Adds new object to objects list
+            
+            entity.addEventListener("loaded", () => {
+                objects.push({
+                    el: entity,
+                    ogPos: entity.object3D.position.clone(),
+                    ogRot: entity.object3D.quaternion.clone(),
+                    ogScale: entity.object3D.scale.clone(),
+                    grabbedBy: null
+                }); //Adds new object and its original state to objects list
+            });
         }
 
         // GRAB & RELEASE
         function grab(handEl) {
-            if (grabbed) return;
+            const isLeft = (handEl === leftHand); 
+            const isRight = (handEl === rightHand);
+
+            if (isLeft){
+                if (leftGrabbed) return;
+            } else if (isRight){
+                if (rightGrabbed) return;
+            }
 
             const wristObj = handEl.object3D.getObjectByName("wrist");
             if (!wristObj) return;
@@ -473,22 +516,29 @@
             const handPos = new THREE.Vector3();
             wristObj.getWorldPosition(handPos);
 
-            const modelPos = new THREE.Vector3();
-            model.object3D.getWorldPosition(modelPos);
-
-            const dist = handPos.distanceTo(modelPos);
-            if (dist < grabDist) {
-                grabbed = wristObj;
-                wristObj.attach(model.object3D);
-                logToVR("Grabbed!");
+            const target = getNearest(objects, handPos, grabDist);
+            if (target) {
+                if (isLeft) leftGrabbed = target;
+                else if (isRight) rightGrabbed = target;
+                wristObj.attach(target.el.object3D);
             }
         }
 
         function release(handEl) {
-            const wristObj = handEl.object3D.getObjectByName("wrist");
-            if (grabbed !== wristObj) return;
-            scene.object3D.attach(model.object3D);
-            grabbed = null;
+            const isLeft = (handEl === leftHand); 
+            const isRight = (handEl === rightHand);
+
+            let target;
+            if (isLeft) {
+                target = leftGrabbed;
+            } else if (isRight) {
+                target = rightGrabbed;
+            }
+            if (!target) return;
+
+            scene.object3D.attach(target.el.object3D);
+            if (isLeft) leftGrabbed = null;
+            else if (isRight) rightGrabbed = null;
             logToVR("Released");
         }
 

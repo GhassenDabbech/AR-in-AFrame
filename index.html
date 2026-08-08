@@ -488,11 +488,7 @@
 
         function spawnObject(url) {
             const entity = document.createElement("a-entity");
-            entity.setAttribute("gltf-model", url);
-            entity.setAttribute("position", "0 1.5 -1");
-            entity.setAttribute("scale", "0.1 0.1 0.1");
-            scene.appendChild(entity);
-            
+
             entity.addEventListener("loaded", () => {
                 objects.push({
                     el: entity,
@@ -506,6 +502,11 @@
             entity.addEventListener("error", (err) => {
                 logToVR(url + " failed to load: " + err);
             });
+
+            entity.setAttribute("gltf-model", url);
+            entity.setAttribute("position", "0 1.5 -1");
+            entity.setAttribute("scale", "0.1 0.1 0.1");
+            scene.appendChild(entity);
         }
 
         // GRAB & RELEASE

@@ -502,6 +502,10 @@
                     grabbedBy: null
                 }); //Adds new object and its original state to objects list
             });
+
+            entity.addEventListener("error", (err) => {
+                logToVR(url + " failed to load: " + err);
+            });
         }
 
         // GRAB & RELEASE

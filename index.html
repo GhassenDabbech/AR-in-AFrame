@@ -489,7 +489,8 @@
         function spawnObject(url) {
             const entity = document.createElement("a-entity");
 
-            entity.addEventListener("loaded", () => {
+            entity.addEventListener("model-loaded", () => {
+                logToVR("model loaded ok: " + url);
                 objects.push({
                     el: entity,
                     ogPos: entity.object3D.position.clone(),

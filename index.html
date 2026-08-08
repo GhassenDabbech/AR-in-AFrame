@@ -142,6 +142,15 @@
             if (htmlDebug) htmlDebug.textContent = msg;
         }
 
+        window.addEventListener("error", (e) => {
+            logToVR("javascrpt error: " + e.message + "@line " + e.lineno);
+        });
+
+        window.addEventListener("unhandledrejection", (e) => {
+            logToVR("promise error: " + ( e.reason && e.reason.message  ? e.reason.message : e.reason));
+        });
+        
+
         async function exitARforScan() {
             const xrSession = scene.renderer.xr.getSession();
             if (!xrSession) return;

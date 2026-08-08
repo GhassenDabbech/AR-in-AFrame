@@ -510,8 +510,8 @@
                 }); //Adds new object and its original state to objects list
             });
 
-            entity.addEventListener("error", (err) => {
-                logToVR(url + " failed to load: " + err);
+            entity.addEventListener("model-error", (err) => {
+                logToVR(url + " failed to load: " + JSON.stringify(err.detail));
             });
 
             entity.setAttribute("gltf-model", url);

@@ -99,6 +99,7 @@
 
         let thumbsUpTimer = 0;
         let awaitingScanResult = false;
+        let scanRequested = false;
     
         model.addEventListener("loaded", () => {
             // Fill placeholders once model loads
@@ -468,6 +469,10 @@
             window.open(finalUrl, "_blank");
         });
 
+        document.getElementById("scan-link").addEventListener("click", () => {
+            scanRequested = true;
+        });
+
         function resetModel(){
             scene.object3D.add(model.object3D); // Auto-detach from hand
             model.object3D.position.copy(ogPos);
@@ -550,7 +555,10 @@
                 return;
             }
             scene.renderer.setClearColor(0x000000, 0);
-            awaitingScanResult = true; //starts polling everytime AR is entered or resumed
+            if (scanRequested) {
+                awaitingScanResult = true; //starts polling everytime AR is entered or resumed
+                scanRequested = false;
+            }
         });
         
     </script>

@@ -488,6 +488,7 @@
 
         function spawnObject(url) {
             const entity = document.createElement("a-entity");
+            logToVR("SPWNTEST running");
 
             entity.addEventListener("model-loaded", () => {
                 logToVR("model loaded ok: " + url);

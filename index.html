@@ -90,11 +90,6 @@
         let twoHandsStartDir = new THREE.Vector3(); // For 2-fist-rotation
         let twoHandsStartQuat = new THREE.Quaternion(); // For 2-fist- rotation
 
-        // Create empty placeholders for original transforms (for reset)
-        const ogPos = new THREE.Vector3();
-        const ogRot = new THREE.Quaternion();
-        const ogScale = new THREE.Vector3();
-
         let crossTimer = 0 // For reset
 
         let thumbsUpTimer = 0;
@@ -102,23 +97,16 @@
         let scanRequested = false;
     
         model.addEventListener("loaded", () => {
-            // Fill placeholders once model loads
-            ogPos.copy(model.object3D.position);
-            ogRot.copy(model.object3D.quaternion);
-            ogScale.copy(model.object3D.scale);
-
             objects[0] = {
                 el: model,
-                ogPos: ogPos.clone(),
-                ogRot: ogRot.clone(),
-                ogScale: ogScale.clone(),
-                grabbedBy: null
+                ogPos: model.object3D.position.clone(),
+                ogRot: model.object3D.quaternion.clone(),
+                ogScale: model.object3D.scale.clone(),
             };
         });
 
         // For idle animation:
         let idleActive = false;
-        let idleAnchor = new THREE.Vector3();
         let idleTime = 0;
         let idleWaitTime = 0;
 
@@ -489,10 +477,12 @@
         });
 
         function resetModel(){
-            scene.object3D.add(model.object3D); // Auto-detach from hand
-            model.object3D.position.copy(ogPos);
-            model.object3D.quaternion.copy(ogRot);
-            model.object3D.scale.copy(ogScale);
+            for (const obj of objects) {
+                scene.object3D.add(obj.el.object3D); // Auto-detach from hand
+                obj.el.object3D.position.copy(obj.ogPos);
+                obj.el.object3D.quaternion.copy(obj.ogRot);
+                obj.el.object3D.scale.copy(obj.ogScale);
+            }
             //logToVR("reset pos: " + model.object3D.position.x.toFixed(2) + " " + model.object3D.position.y.toFixed(2) + " " + model.object3D.position.z.toFixed(2));
 
             leftGrabbed = null;
@@ -512,7 +502,6 @@
                     ogPos: entity.object3D.position.clone(),
                     ogRot: entity.object3D.quaternion.clone(),
                     ogScale: entity.object3D.scale.clone(),
-                    grabbedBy: null
                 }); //Adds new object and its original state to objects list
             });
 

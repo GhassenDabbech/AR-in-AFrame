@@ -335,7 +335,7 @@
                     }
                 }
                 // 2-FIST-MODE:
-                if (leftClosed && rightClosed && leftGrabbed === rightGrabbed) {
+                if (leftClosed && rightClosed && leftGrabbed && leftGrabbed === rightGrabbed) {
                     const target = leftGrabbed; //same as right
                     const leftPos = getWristPos(leftHand);
                     const rightPos = getWristPos(rightHand);

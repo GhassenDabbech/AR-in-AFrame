@@ -415,15 +415,20 @@
 
                     if (idleWaitTime >= 10){
                             if (!idleActive) {
-                            idleAnchor.copy(model.object3D.position);
+                                for (const obj of objects) {
+                                    obj.idleAnchor = obj.el.object3D.position.clone();
+                                }
                             idleTime = 0;
                             idleActive = true;
                         }
                         idleTime += delta / 1000;
 
                         const offsetY = Math.sin(idleTime * 0.5) * 0.02;
-                        model.object3D.position.set(idleAnchor.x, idleAnchor.y + offsetY, idleAnchor.z);
-                        model.object3D.rotation.y += IDLE_SPEED * (delta / 1000);
+
+                        for (const obj of objects) {
+                            obj.el.object3D.position.set(obj.idleAnchor.x, obj.idleAnchor.y + offsetY, obj.idleAnchor.z);
+                            obj.el.object3D.rotation.y += IDLE_SPEED * (delta / 1000);
+                        }
                     } 
                 } else {
                     idleWaitTime = 0;

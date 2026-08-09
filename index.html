@@ -335,7 +335,8 @@
                     }
                 }
                 // 2-FIST-MODE:
-                if (leftClosed && rightClosed && (leftGrabbed || rightGrabbed)) {
+                if (leftClosed && rightClosed && leftGrabbed === rightGrabbed) {
+                    const target = leftGrabbed; //same as right
                     const leftPos = getWristPos(leftHand);
                     const rightPos = getWristPos(rightHand);
 
@@ -345,20 +346,20 @@
                             // Reparent to scene manually (after it was attached to 1 hand)
                             // previously used attach(), which caused the model to teleport
                             const worldPos = new THREE.Vector3();           // Empty vector to hold model's real position
-                            model.object3D.getWorldPosition(worldPos);          // Read it
+                            target.el.object3D.getWorldPosition(worldPos);          // Read it
 
                             const worldQuat = new THREE.Quaternion();       // Empty vector to hold model's real rotation
-                            model.object3D.getWorldQuaternion(worldQuat);       // Read it
+                            target.el.object3D.getWorldQuaternion(worldQuat);       // Read it
 
                             const worldScale = new THREE.Vector3();         // Empty vector to hold model's real size
-                            model.object3D.getWorldScale(worldScale);           // Read it
+                            target.el.object3D.getWorldScale(worldScale);           // Read it
 
-                            scene.object3D.add(model.object3D);
+                            scene.object3D.add(target.el.object3D);
 
-                            model.object3D.position.copy(worldPos);     // Put position back
-                            model.object3D.quaternion.copy(worldQuat);  // Put rotation back
-                            model.object3D.scale.copy(worldScale);      // Put size back
-                            
+                            target.el.object3D.position.copy(worldPos);     // Put position back
+                            target.el.object3D.quaternion.copy(worldQuat);  // Put rotation back
+                            target.el.object3D.scale.copy(worldScale);      // Put size back
+
                             twoHandsStartQuat.copy(worldQuat)   // For 2-Fist-Rotation
 
                             twoHandsStartDist = dist;
@@ -368,26 +369,26 @@
                             // needed to fix sudden teleport bug when scaling:
                             const startMid = new THREE.Vector3().addVectors(leftPos, rightPos).multiplyScalar(0.5);
                             twoHandsStartMidpoint.copy(startMid);
-                            twoHandsStartPos.copy(model.object3D.position);
+                            twoHandsStartPos.copy(target.el.object3D.position);
 
                             // needed for 2-fist-Rotation
                             twoHandsStartDir.copy(getHandDir(leftPos, rightPos));
                         } else {
                             const scaleFactor = dist / twoHandsStartDist;
                             const newScale = twoHandStartScale * scaleFactor;
-                            model.object3D.scale.set(newScale, newScale, newScale);
-                            
+                            target.el.object3D.scale.set(newScale, newScale, newScale);
+
                             // TO DO: Make model move while in 2-fist mode
                             // (+ fix sudden teleport bug when scaling)
                             const midPoint = new THREE.Vector3().addVectors(leftPos, rightPos).multiplyScalar(0.5);
                             const moved = new THREE.Vector3().subVectors(midPoint, twoHandsStartMidpoint);
                             const newPos = new THREE.Vector3().addVectors(twoHandsStartPos, moved);
-                            model.object3D.position.copy(newPos);
+                            target.el.object3D.position.copy(newPos);
 
                             // TO DO: Make model rotate while in 2-fist-mode
                             const currentDir = getHandDir(leftPos, rightPos);
                             const deltaQuat = new THREE.Quaternion().setFromUnitVectors(twoHandsStartDir, currentDir);
-                            model.object3D.quaternion.copy(deltaQuat).multiply(twoHandsStartQuat);
+                            target.el.object3D.quaternion.copy(deltaQuat).multiply(twoHandsStartQuat);
                         }
                     }
                 } else {

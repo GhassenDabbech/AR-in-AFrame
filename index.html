@@ -305,7 +305,7 @@
                 if (awaitingScanResult) {
                     try {
                         const response = await fetch("http://localhost:55555/");
-                        const url = await response.text();
+                        const url = decodeURIComponent(await response.text());
                         if (url && url !== lastKnownScanUrl) {
                             lastKnownScanUrl = url;
                             awaitingScanResult = false;

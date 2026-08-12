@@ -572,7 +572,7 @@
             logToVR("Released");
 
             const newestWidth = getWidth(target.el);
-            const edge = target.el.object3D.position.x + (target.width / 2);
+            const edge = target.el.object3D.position.x + (newestWidth / 2);
             if (edge > rightEdge) rightEdge = edge;
         }
 

@@ -131,6 +131,8 @@
         let objects = [];
         let lastKnownScanUrl = "";
 
+        const controlsText = document.querySelector("#leftHand a-text");
+
         // Load model
         const modelUrl = decodeURIComponent(location.search.substring(1));
         if (modelUrl) model.setAttribute("gltf-model", modelUrl);
@@ -342,6 +344,9 @@
                         rightClosed = closed;
                     }
                 }
+
+                controlsText.setAttribute("visible", !leftClosed);
+
                 // 2-FIST-MODE:
                 if (leftClosed && rightClosed && leftGrabbed && leftGrabbed === rightGrabbed) {
                     const target = leftGrabbed; //same as right

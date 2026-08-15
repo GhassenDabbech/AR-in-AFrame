@@ -297,6 +297,12 @@
                 if (!xrSession) return;
                 const refSpace = scene.renderer.xr.getReferenceSpace();
 
+                for (const source of xrSession.inputSources) {
+                    if (source.hand) {
+                        logToVR(Array.from(source.hand.keys()).join(", "));
+                    }
+                }
+
                 if (awaitingScanResult) {
                     try {
                         const response = await fetch("http://localhost:55555/");

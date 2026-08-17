@@ -139,48 +139,10 @@
 
         // send to AR-console to debug
         function logToVR(msg) {
-            //return; // Delete this to turn on console
+            return; // Delete this to turn on console
             debugText.setAttribute("text", "value: " + msg);
             const htmlDebug = document.getElementById("debug-html");
             if (htmlDebug) htmlDebug.textContent = msg;
-        }
-
-        window.addEventListener("error", (e) => {
-            logToVR("javascrpt error: " + e.message + "@line " + e.lineno);
-        });
-
-        window.addEventListener("unhandledrejection", (e) => {
-            logToVR("promise error: " + ( e.reason && e.reason.message  ? e.reason.message : e.reason));
-        });
-        
-
-        async function exitARforScan() {
-            const xrSession = scene.renderer.xr.getSession();
-            if (!xrSession) return;
-
-            logToVR('ending session');
-            xrSession.addEventListener("end", async () => {
-                logToVR("session ended");
-
-                const overlay = document.getElementById("scanner-overlay");
-                const video = document.getElementById("qr-video");
-
-                overlay.style.display = "block";
-                
-                setTimeout(async () => {
-                    awaitingScanResult = true;
-                    logToVR("awaiting scan result");
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                        video.srcObject = stream;
-                        logToVR("cam live");
-                    } catch (err) {
-                        //logToVR("cam fail: " + err.message);
-                    }
-                }, 2000);
-            }, {once: true});
-
-            await xrSession.end();
         }
 
         //<------------------------------------------- FIST DETECTION ------------------------------------------->
@@ -212,7 +174,7 @@
         const FIST_THRESHOLD = 2.20;
 
         //I tested hand tracking with my own hand dimensions
-        //TO DO: Make it work for all hand sizes (!!Wichtig!!)
+        //This makes it work for all hand sizes (!!Wichtig!!)
         function getHandSize(hand, frame, refSpace) {
             const wrist = hand.get("wrist");
             const middleMtc = hand.get("middle-finger-metacarpal");
@@ -391,14 +353,14 @@
                             const newScale = twoHandStartScale * scaleFactor;
                             target.el.object3D.scale.set(newScale, newScale, newScale);
 
-                            // TO DO: Make model move while in 2-fist mode
+                            // Makes model move while in 2-fist mode
                             // (+ fix sudden teleport bug when scaling)
                             const midPoint = new THREE.Vector3().addVectors(leftPos, rightPos).multiplyScalar(0.5);
                             const moved = new THREE.Vector3().subVectors(midPoint, twoHandsStartMidpoint);
                             const newPos = new THREE.Vector3().addVectors(twoHandsStartPos, moved);
                             target.el.object3D.position.copy(newPos);
 
-                            // TO DO: Make model rotate while in 2-fist-mode
+                            // Makes model rotate while in 2-fist-mode
                             const currentDir = getHandDir(leftPos, rightPos);
                             const deltaQuat = new THREE.Quaternion().setFromUnitVectors(twoHandsStartDir, currentDir);
                             target.el.object3D.quaternion.copy(deltaQuat).multiply(twoHandsStartQuat);
@@ -448,17 +410,6 @@
                     idleActive = false;
                 }
 
-                // Cam scan test:
-                /*if (!leftClosed && !rightClosed) {
-                    scanTriggerTimer += delta / 1000;
-                    if (scanTriggerTimer >=1){
-                        testExitAndScan();
-                        scanTriggerTimer = 0;
-                    }
-                } else {
-                    scanTriggerTimer = 0;
-                }*/
-
                 //Add objects
                 let anyThumbsUp = false;
                 for (const source of xrSession.inputSources) {
@@ -471,7 +422,6 @@
                         logToVR("exiting ar to show scan button");
                         xrSession.end();
                         document.getElementById("scan-link").style.display = "block";
-                        //window.location.href = "qr2ar://scan";
                         thumbsUpTimer = 0;
                     }
                 } else {
@@ -485,7 +435,6 @@
                     });
                 }
             }
-        // TO DO: ADD INTERACTION FOR NEW OBJECTS
         });
 
         scene.setAttribute("hand-grabber", "");

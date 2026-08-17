@@ -167,8 +167,6 @@
             if (!wristPos || !indexPos || !middlePos) return null;
 
             return (wristPos.distanceTo(indexPos) + wristPos.distanceTo(middlePos)) / 2;
-            //const avgDist = (wristPos.distanceTo(indexPos) + wristPos.distanceTo(middlePos)) / 2;
-            //return avgDist < 0.06;
         }
 
         const FIST_THRESHOLD = 2.20;
@@ -202,8 +200,6 @@
 
             const curlRatio = curl / size;
             const thumbSeparation = thumbPos.distanceTo(indexPos) / size;
-            //logToVR("sep:" + thumbSeparation.toFixed(2) + " curl:" + curlRatio.toFixed(2));
-
 
             return curlRatio < FIST_THRESHOLD && thumbSeparation > THUMB_THRESHOLD
         }
@@ -290,6 +286,7 @@
 
                 for (const source of xrSession.inputSources) {
                     if (!source.hand) continue;
+                    debugText.setAttribute("visible","false"); //Hides 'look at ur hands' msg once they're detected
                     const ratio = getFistRatio(source.hand, frame, refSpace);
                     if (ratio === null) continue;
 
